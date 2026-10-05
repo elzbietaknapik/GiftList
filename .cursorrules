@@ -1,0 +1,1 @@
+﻿Nigdy nie twórz klas dziedziczących po Error. Wszystkie błędy muszą mieć postać obiektu { error: { code: string, message: string, context?: object } }. Zamiast new Date() używaj wyłącznie helpera formatDate().

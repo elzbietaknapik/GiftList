@@ -1,99 +1,95 @@
 <!-- BEGIN @przeprogramowani/10x-cli -->
 
-## Zestaw narzędzi AI 10xDevs — Moduł 1, Lekcja 4
+## Zestaw narzędzi AI 10xDevs — Moduł 1, Lekcja 5
 
-Wprowadź agenta do projektu, którego szkielet utworzyłeś w Lekcji 3, za pomocą **łańcucha kontekstu agenta**:
+Wybierz platformę wdrożeniową i wdroż na produkcję za pomocą **łańcucha infra**:
 
 ```
-(/10x-init  →  /10x-shape  →  /10x-prd  →  /10x-tech-stack-selector  →  /10x-bootstrapper)  →  /10x-agents-md  →  /10x-rule-review  →  /10x-lesson
+(/10x-init  →  /10x-shape  →  /10x-prd  →  /10x-tech-stack-selector  →  /10x-bootstrapper  →  /10x-agents-md  →  /10x-rule-review  →  /10x-lesson)  →  /10x-infra-research  →  Plan Mode deploy
 ```
 
-Łańcuch PRD → tech-stack → bootstrap pochodzi z Lekcji 1–3 (został ponownie dołączony, aby można było poprawić projekt w trakcie pracy). `/10x-agents-md`, `/10x-rule-review` i `/10x-lesson` to główne tematy lekcji. W Lekcji 5 łańcuch zostaje rozszerzony o krok infra/deploy.
+Pełny łańcuch Modułu 1 wdraża elementy z Lekcji 1–4 (uwzględnione ponownie, aby można było poprawić dowolny wcześniejszy kontrakt w trakcie pracy). `/10x-infra-research` jest głównym tematem lekcji; sam krok wdrożenia korzysta z wbudowanego w hosta **Plan Mode**, a nie z dedykowanej umiejętności — to artefakt (`context/deployment/deploy-plan.md`) jest przekazywany dalej.
 
-### Router zadań — Od czego zacząć
+### Router zadań — od czego zacząć
 
-| Umiejętność | Użyj jej, gdy |
+| Umiejętność | Użyj, gdy |
 | --- | --- |
-| **Kontekst agenta (temat lekcji)** | |
-| `/10x-agents-md` | Repozytorium ma utworzony szkielet, ale agent nie ma wdrożenia specyficznego dla projektu. Analizuje repozytorium (manifest pakietów, README, skrypty, konfigurację lint/test, układ, historię commitów) i zapisuje zwięzłe, uporządkowane „Repository Guidelines” w `AGENTS.md` (lub, gdy jest wywoływane z podkatalogu, `AGENTS.md` na poziomie katalogu, przeformułowane wokół lokalnych konwencji i dominującej jednostki). Użyj jako alternatywy dla wbudowanego `/init` hosta lub jako rozwiązania awaryjnego dla narzędzi, które go nie mają. Treść na poziomie repozytorium ma docelowo ~200 linii; przewodniki na poziomie katalogu mają docelowo 120–250 słów. |
-| `/10x-rule-review <path>` | Masz plik reguł dla AI (`AGENTS.md`, plik konfiguracji AI projektu (AGENTS.md), `.cursor/rules/*.mdc`, `.github/copilot-instructions.md`, `.windsurfrules`, zagnieżdżone pliki dla poszczególnych obszarów) i chcesz uzyskać kartę wyników w 5 osiach: długość, osadzone fragmenty kodu/konfiguracji, precyzja języka, redundancja z wiedzą publiczną oraz kolejność reguł. Niezależne od narzędzia — ocenia stan artefaktu, a nie projektu. Domyślne wyjście jest tylko do odczytu; tylko Check 5 (zmiana kolejności) może edytować i wyłącznie po wyraźnej akceptacji. |
-| `/10x-lesson [seed]` | Zauważyłeś powtarzającą się regułę wartą uwidocznienia w przyszłych uruchomieniach `/10x-frame`, `/10x-research`, `/10x-plan`, `/10x-plan-review`, `/10x-implement` i `/10x-impl-review`. Dopisuje pojedynczy wpis (Context / Problem / Rule / Applies to) do `context/foundation/lessons.md`. Przy pierwszym użyciu sam inicjalizuje plik z kanonicznym nagłówkiem `# Lessons Learned`. Tylko dopisywanie — nigdy nie zmienia kolejności ani nie przepisuje wcześniejszych wpisów. |
+| **Infrastruktura (temat lekcji)** | |
+| `/10x-infra-research [path-to-tech-stack-or-prd]` | Masz `context/foundation/tech-stack.md` (a najlepiej również `prd.md`) i musisz wybrać platformę wdrożeniową dla MVP. Umiejętność ładuje stack jako twarde ograniczenie, przeprowadza 5-pytaniowy wywiad z deweloperem (trwałe połączenia, wrażliwość na koszty, istniejąca znajomość, zasięg globalny, preferencja współlokalizacji), uruchamia równoległe badania podagentów dotyczące sześciu kandydatów na platformę, ocenia je jako Pass/Partial/Fail według pięciu kryteriów przyjaznych agentom z `references/agent-friendly-criteria.md`, wybiera trzy najlepsze oraz wykonuje trójperspektywiczną kontrolę antybiasową lidera (adwokat diabła, pre-mortem, unknown unknowns) przed zapisaniem `context/foundation/infrastructure.md`. Użyj PO `/10x-tech-stack-selector`, PRZED `/10x-implement`. |
+| **Wdrożenie (wbudowane w hosta, nie jest umiejętnością)** | |
+| Plan Mode deploy | Masz `infrastructure.md` + `tech-stack.md` i chcesz przejrzeć plan tylko do odczytu, zanim jakakolwiek zmiana trafi na platformę. Aktywuj tryb planowania swojego asystenta AI do kodowania (na przykład asystent terminalowy może używać przełącznika trybu, a IDE może oferować dedykowany przycisk) z promptem \"Wykonajmy pierwsze wdrożenie w oparciu o `@infrastructure.md`, zgodnie ze stackiem z `@tech-stack.md`\". Przeczytaj plan, zażądaj poprawek, zatwierdź go, a następnie pozwól agentowi wykonać działania. Zatwierdzony plan pozostaje w `context/deployment/deploy-plan.md`, aby planowanie kamieni milowych w następnej lekcji mogło odwołać się do tego, co jest już wdrożone i które sekrety są już podłączone. |
 | **W razie potrzeby uruchom ponownie wcześniejsze kroki** | |
-| `/10x-init` / `/10x-shape` / `/10x-prd` / `/10x-tech-stack-selector` / `/10x-bootstrapper` / `/10x-stack-assess` / `/10x-health-check` | Zgrupowane, aby można było poprawić PRD, zmienić stack lub ponownie utworzyć szkielet w trakcie pracy. Jeśli `/10x-rule-review` oznaczy `FAIL`, którego nie da się rozwiązać przez skrócenie, często wskazuje to na niejednoznaczne decyzje dotyczące PRD lub stacku — uruchom ponownie wcześniejszą umiejętność zamiast wypełniać `AGENTS.md` poprawkami. |
+| `/10x-init` / `/10x-shape` / `/10x-prd` / `/10x-tech-stack-selector` / `/10x-bootstrapper` / `/10x-agents-md` / `/10x-rule-review` / `/10x-lesson` / `/10x-stack-assess` / `/10x-health-check` | Zebrane razem, aby można było poprawić dowolny wcześniejszy kontrakt w trakcie pracy. Jeśli kontrola antybiasowa wymusi zmianę platformy, która wpływa na decyzję ukształtowaną przez stack (np. \"this DB doesn't fit any platform we'd accept\"), uruchom ponownie `/10x-tech-stack-selector`, aby zachować zgodność `tech-stack.md` i `infrastructure.md`. |
 
 ### Jak łańcuch przekazuje pracę dalej
 
-- `/10x-agents-md` zapisuje (lub precyzyjnie aktualizuje) `AGENTS.md` w rozstrzygniętym zakresie. Zakres na poziomie repozytorium = plik znajduje się w katalogu głównym repozytorium i opisuje projekt jako całość; zakres na poziomie katalogu = plik znajduje się obok kodu, którym zarządza, i jest przeformułowany wokół lokalnej jednostki, całkowicie pomijając opis całego repozytorium. Umiejętność nigdy nie nadpisuje po cichu — gdy docelowy plik istnieje, przechodzi do przepływu aktualizacji.
-- `/10x-rule-review` czyta dowolny plik markdown z regułami dla AI, który mu wskażesz, i wyświetla kartę wyników z 5 kontrolami (`OK` / `WARN` / `FAIL`) wraz z konkretnymi poprawkami. Nie zależy od wcześniejszego uruchomienia `/10x-agents-md`; możesz tak samo sprawdzać `.cursor/rules/`, instrukcje Copilot lub ręcznie napisany plik konfiguracji AI projektu (AGENTS.md).
-- `/10x-lesson` przy pierwszym użyciu sam inicjalizuje `context/foundation/lessons.md`, a następnie dopisuje po jednym wpisie Context/Problem/Rule/Applies-to na każde wywołanie. Plik jest wykorzystywany jako wcześniejsza wiedza przez umiejętności fazy planowania i przeglądu wprowadzone później w przepływie pracy — `/10x-frame`, `/10x-research`, `/10x-plan`, `/10x-plan-review`, `/10x-implement`, `/10x-impl-review`.
+- `/10x-infra-research` odczytuje `context/foundation/tech-stack.md` (język, framework, runtime, baza danych) jako **twarde ograniczenia** — platformy, które nie mogą uruchomić stacka, są odrzucane przed oceną. Odczytuje również `context/foundation/prd.md` (skalę, opóźnienia, oczekiwania dotyczące dostępności) jako **miękkie wagi** podczas oceniania. Oba dane wejściowe są opcjonalne, lecz zdecydowanie zalecane; bez nich umiejętność kontynuuje, ale wyświetla ostrzeżenie.
+- Umiejętność zapisuje `context/foundation/infrastructure.md` jako trzeci kontrakt fundamentowy: frontmatter (`project`, `researched_at`, `recommended_platform`, `runner_up`, `context_type`, `tech_stack`) oraz treść obejmującą rekomendację, pełne porównanie platform z macierzą ocen, ustalenia antybiasowe, historię operacyjną (preview / secrets / rollback / approval / logs) i rejestr ryzyk wiążący każdy wpis z perspektywą, która go ujawniła. W przypadku kolizji umiejętność pyta: nadpisać, zapisać jako `infrastructure-v2.md` czy przerwać.
+- Plan Mode odczytuje razem `infrastructure.md` i `tech-stack.md`. Agent tworzy krok po kroku plan obejmujący zautomatyzowane kroki, za które odpowiada, bramki ręcznej konfiguracji (tworzenie konta, konfiguracja sekretów), dokładne polecenia wdrożeniowe (polecenia Pages i Workers NIE są wymienne w Cloudflare — plan musi je określać) oraz kroki weryfikacyjne. Plan jest odrzucany/edytowany, aż będzie poprawny; dopiero wtedy Plan Mode zostaje zakończony i rozpoczyna się wykonanie. Zatwierdzony plan trafia do `context/deployment/deploy-plan.md` i jest wykorzystywany dalej przez umiejętności planowania kamieni milowych jako źródło prawdy o „tym, co jest już wdrożone”.
 
-### Co przechwytują umiejętności tej lekcji (i czego NIE przechwytują)
+### Co rejestrują umiejętności lekcji (a czego NIE)
 
-- **`/10x-agents-md` przechwytuje**: strukturę projektu, polecenia build/test/lint faktycznie obecne w skryptach, konwencje commitów wywnioskowane z historii, specyficzne dla repozytorium pułapki, które agent mógłby inaczej przeoczyć, odwołania do kanonicznych plików przez ścieżki `@` zamiast wklejania ich zawartości. Zakres na poziomie katalogu dodatkowo przechwytuje: lokalne wzorce nazewnictwa/układu wywnioskowane z sąsiednich elementów, dozwolone/zabronione importy, wzorzec testów używany przez sąsiednie elementy oraz pułapki widoczne w bezpośrednim obszarze.
-- **`/10x-agents-md` NIE** wkleja zawartości `tsconfig.json` / `eslint.config` / dokumentacji frameworka, którą agent już zna; NIE generuje ogólnych intencji typu „write clean code”; NIE zastępuje wbudowanego `/init` hosta, gdy taki istnieje — jest pozycjonowane jako alternatywa lub rozwiązanie awaryjne, a nie domyślne.
-- **`/10x-rule-review` przechwytuje**: ocenę długości (OK ≤ 200 niepustych linii, WARN 201–500, FAIL 501+), bloki kodu/konfiguracji, które powinny być zamiast tego odwołaniami `@`, język niejasnych intencji, redundancję z dokumentacją frameworka, którą agent zna już z treningu, oraz propozycję zmiany kolejności w Check 5, która przenosi krytyczne reguły na górę.
-- **`/10x-rule-review` NIE** edytuje pliku domyślnie; NIE ocenia zawartości projektu (architektury, wyborów stacku) — ocenia stan artefaktu reguł; NIE generuje „poprawionej wersji” pliku (Check 5 może przenosić sekcje po wyraźnej akceptacji, ale nigdy nie przepisuje brzmienia reguł).
-- **`/10x-lesson` przechwytuje**: jeden wpis na wywołanie z krótkim rozkazującym tytułem H2 (tytuł JEST regułą), Context (podsystem / faza / wzorzec pliku, wystarczająco konkretny, aby można było dopasować wzorzec), Problem (co konkretnie psuje się bez reguły, najlepiej wraz z wcześniejszym incydentem), Rule (1–2 zdania w trybie rozkazującym, które można dosłownie wkleić do przyszłego ustalenia przeglądu), Applies to (podzbiór `frame`, `research`, `plan`, `plan-review`, `implement`, `impl-review` lub `all`).
-- **`/10x-lesson` NIE** edytuje ani nie usuwa istniejących lekcji — plik celowo obsługuje wyłącznie dopisywanie (bezmyślne przepisywanie powtarzających się reguł jest trybem porażki, któremu ta konwencja zapobiega); NIE grupuje wielu reguł na wywołanie; NIE wypełnia pól proaktywnie (użytkownik wykonuje pisanie — to cena przechwytywania reguł poza ustrukturyzowanym przeglądem).
+- **`/10x-infra-research` rejestruje**: shortlistę platform ocenionych według pięciu kryteriów przyjaznych agentom (jakość CLI, stopień zarządzania/serverless, dokumentacja czytelna dla agentów, stabilne/skryptowalne API wdrożeniowe, MCP lub pierwszorzędna integracja agentowa), trzy wyniki antybiasowe dotyczące lidera (ponumerowane słabości, 150–200-słowowa narracja porażki, 3–5 unknown-unknowns), historię operacyjną z jedną konkretną odpowiedzią na każdą oś (nie kategoriami) oraz rejestr ryzyk, w którym każdy wiersz wskazuje perspektywę źródłową (`Devil's advocate` / `Pre-mortem` / `Unknown unknowns` / `Research finding`). Status każdej funkcji niebędącej GA jest rejestrowany inline (`beta` / `preview` / `region-limited` / `deprecated`) wraz z datą sprawdzenia statusu.
+- **`/10x-infra-research` NIE** buduje obrazów Docker ani nie zapisuje Dockerfile, nie konfiguruje potoków CI/CD ani nie planuje poza zakresem MVP (wieloregionowe HA jest wyraźnie poza zakresem). NIE podejmuje decyzji za Ciebie — użytkownik akceptuje, zmienia na drugie miejsce lub przerywa po kontroli, a decyzja ta jest rejestrowana w wyniku.
+- **Plan Mode** rejestruje: jawną bramkę człowieka między „agent ma plan” a „agent modyfikuje produkcję”. Artefakt (`deploy-plan.md`) stanowi ścieżkę audytu dla pytania „co miało się wydarzyć”, gdy rzeczywiste uruchomienie pójdzie źle. Plan Mode NIE zastępuje `/10x-infra-research` (decyzja o platformie musi być już podjęta — Plan Mode planuje wdrożenie, nie wybiera miejsca wdrożenia).
 
-### Test kwalifikacji (filtr dla AGENTS.md / pliku konfiguracji AI projektu (AGENTS.md))
+### Pięć kryteriów przyjaznych agentom (i dlaczego są kluczowe)
 
-Przed dodaniem reguły do dowolnego pliku reguł dla AI zapytaj: *czy agent mógłby wiedzieć to bez tego pliku? Czy publiczne dane treningowe — książki, blogi, repozytoria w tym stacku — mogły go na to przygotować?* Jeśli tak, usuń to. Jeśli nie, zachowaj. Plik służy do wdrożenia agenta, który zna już TypeScript / Python / twój framework, ale NIE zna twoich lokalnych konwencji.
+Kryteria tworzące macierz ocen `/10x-infra-research` nie są ogólnymi osiami „dobrej platformy” — są to konkretne cechy określające, czy agent może obsługiwać tę platformę podczas sesji bez konieczności prowadzenia go za rękę:
 
-Należy:
-- nieoczywiste konwencje projektu (kształt odpowiedzi błędów, nazewnictwo plików, dozwolone ścieżki importów)
-- specyficzne dla projektu pułapki i „żenujące” obejścia związane z historią lub błędami zależności
-- odwołania do kanonicznych plików przez ścieżki `@` (np. `@src/features/users/user.service.ts` jako odniesienie do wzorca, a nie wklejony kod)
+1. **CLI-first** — każda rutynowa operacja ma udokumentowane polecenie; agent nie musi klikać w panelu.
+2. **Managed / serverless** — mniej ruchomych części oznacza mniej sposobów, na które agent (lub Ty) może zepsuć coś, czym powinna zajmować się platforma.
+3. **Dokumentacja czytelna dla agentów** — dokumentacja markdown / `llms.txt` / hostowana na GitHubie, którą agent może pobrać i przeanalizować, a nie marketingowe strony renderowane przez JS.
+4. **Stabilne, skryptowalne API wdrożeniowe** — przewidywalne kody wyjścia, ustrukturyzowane dane wyjściowe, brak interaktywnych promptów w środku wdrożenia.
+5. **Serwer MCP lub pierwszorzędna integracja agentowa** — bonus, nie wymóg. Samo CLI wystarcza dla MVP; MCP jest opłacalne, gdy agent wykonuje dziesiątki ustrukturyzowanych zapytań wobec stanu na żywo.
 
-NIE należy:
-- dokumentacja popularnych frameworków
-- zawartość README, którą agent i tak przeczyta (połącz przez `@README.md`)
-- popularne ogólne porady („use TypeScript strict mode”), które są już wymuszane przez konfigurację
-- stwierdzenia intencji („write clean code”, „follow good practices”) — przekształć w sprawdzalne zachowanie albo usuń
+Twarde filtry są stosowane przed oceną (wymóg trwałego połączenia odrzuca Netlify/Vercel działające wyłącznie serverless; niezgodność runtime ze stackiem całkowicie odrzuca platformę). Odpowiedzi z wywiadu następnie zmieniają wagi kryteriów — wrażliwość na koszty penalizuje drogie poziomy bazowe, znajomość rozstrzyga remisy, preferencja globalnego zasięgu faworyzuje platformy edge-native, a preferencja współlokalizacji faworyzuje zintegrowane bazy danych.
 
-### U-kształtna uwaga i szczegółowe reguły
+### Antybias jako dyscyplina decyzyjna (nie teatr)
 
-LLM-y zwracają największą uwagę na początek i koniec kontekstu (Lost-in-the-Middle / U-shaped attention). Długi monolityczny plik konfiguracji AI projektu (AGENTS.md) umieszcza reguły ze środka w strefie najsłabszej uwagi. Dwie praktyczne konsekwencje:
+Każda rozmowa badawcza z LLM ma wbudowane przechylenie w stronę tego, co użytkownik już zasygnalizował. `/10x-infra-research` stosuje trzy ustrukturyzowane perspektywy wobec lidera PRZED zapisaniem pliku, nie po:
 
-1. **Najważniejsze reguły trafiają na górę** każdego pliku reguł.
-2. **Reguły dla poszczególnych obszarów powinny znajdować się obok ich kodu** — zagnieżdżone `AGENTS.md` / plik konfiguracji AI projektu (AGENTS.md) wewnątrz `src/api/`, `.cursor/rules/*.mdc` z globami plików itd. Szczegółowe pliki są ładowane selektywnie i docierają w całości blisko początku własnej sekcji, zamiast być zakopane w linii 400 jednego dużego pliku.
+- **Adwokat diabła** — *znajdź słabości, ukryte koszty i tryby awarii właściwe dla wdrażania `<this stack>` na `<this platform>`*. Wynikiem jest ponumerowana lista 3–5 konkretów, a nie kategorii.
+- **Pre-mortem** — *sześć miesięcy później ta decyzja okazała się kompletną katastrofą; przeanalizuj założenia i niedoszacowane ryzyka, które do tego doprowadziły*. Wynikiem jest narracja o długości 150–200 słów; narracje ujawniają konkretne kształty porażki, które ukrywają abstrakcyjne listy ryzyk.
+- **Unknown unknowns** — *co jest prawdą o tej kombinacji, czego nie ujawniają w oczywisty sposób strona marketingowa i dokumentacja?* Wynikiem jest 3–5 nieoczywistych ryzyk.
 
-`/10x-rule-review` Check 5 (zmiana kolejności) wdraża konsekwencję (1); test kwalifikacji wraz z `/10x-agents-md` na poziomie katalogu wdraża konsekwencję (2).
+Po kontroli użytkownik ma trzy rzeczywiste opcje: **kontynuować z liderem i uwzględnić ryzyka w rejestrze**, **zmienić na drugie miejsce** (i ponownie wykonać kontrolę dla nowego lidera) albo **zmienić na trzecie miejsce**. Trzecia opcja jest rzadka; jeśli nigdy nie pojawia się w wielu uruchomieniach, kontrola zdegradowała się do rytuału i powinna zostać przepisana.
 
-### Ćwiczenie kalibracyjne pięciu wzorców
+Dwie dodatkowe techniki (nie wymagają umiejętności, surowe prompty) należą do tego samego zestawu narzędzi: zmuszanie modelu do porównania trzech alternatyw w tabeli markdown (struktura jest lepsza niż „ta sama odpowiedź innymi słowami”) oraz rotacja ról (ta sama decyzja oczami frontend developera, osoby odpowiedzialnej za bezpieczeństwo i właściciela kosztów — ujawnij koszt ponoszony przez każdą rolę i zaproponuj alternatywy, jeśli którakolwiek z nich się waha).
 
-Przed zapisaniem reguły sprawdź, czy agent rzeczywiście łamie konwencję bez niej. Wybierz jeden wzorzec ze swojego projektu (kształt odpowiedzi błędów, nazewnictwo plików, styl importów, struktura modułów, obsługa dat). Następnie:
+### CLI vs MCP dla operacyjności infrastruktury na żywo
 
-1. Poproś agenta o zaimplementowanie wzorca 3–5 razy z czystego stanu, bez reguły.
-2. Zanotuj miejsca, w których złamał konwencję; zapisz czas uruchomienia, przeanalizowane pliki oraz widoczny koszt/tokeny, jeśli host je udostępnia.
-3. Dodaj regułę składającą się z 1–3 zdań w odpowiednim zakresie (root lub poziom obszaru).
-4. Uruchom ponownie to samo zadanie w świeżej sesji i porównaj zgodność z konwencją, czas, pliki oraz iteracje.
+Po wdrożeniu agent potrzebuje sposobu komunikacji z działającą platformą. Dwie ścieżki, uzupełniające się, a nie konkurujące:
 
-Jeśli agent już bez reguły wykazuje tendencję do stosowania konwencji, nie potrzebujesz tej reguły. Jeśli systematycznie wybiera niewłaściwy wzorzec, znalazłeś regułę o dużej dźwigni, którą warto dodać. To ćwiczenie pokazuje, jak w praktyce wygląda „zasłużenie na regułę poprzez powtarzającą się porażkę”.
+- **CLI** (`wrangler`, `flyctl`, `vercel`, `gh`) — jawne i audytowalne, dane wyjściowe pozostają w terminalu, bezpieczniejsze ustawienia domyślne dla nieodwracalnych działań (np. `netlify deploy` domyślnie tworzy draft; należy przekazać `--prod`). Najlepsze dla MVP: minimalna konfiguracja, niski koszt kontekstu (brak wstępnie załadowanych schematów narzędzi), a agent musi znać polecenie (w czym pomaga umiejętność dla danego narzędzia).
+- **MCP** — dedykowany serwer udostępniający ustrukturyzowane narzędzia ze schematami (`pages_deployments_list` itd.). Każdy podłączony serwer MCP dodaje definicje narzędzi do okna kontekstu, więc koszt kumuluje się między serwerami. Jest opłacalny, gdy agent wykonuje wiele zapytań typu discovery wobec stanu na żywo (logi, różnice wdrożeń), a ustrukturyzowany JSON jest lepszy niż parsowanie danych wyjściowych CLI.
 
-### Hierarchia i interoperacyjność narzędzi
+Rozsądne ustawienie domyślne: zacznij od CLI, dodaj MCP, gdy zauważysz powtarzający się wzorzec przechodzenia przez `--help`, który agent musi wykonywać, aby odpowiedzieć na klasę pytań. Ujęcie Anthropic w [building-agents-that-reach-production](https://claude.com/blog/building-agents-that-reach-production-systems-with-mcp) brzmi: „API, CLI i MCP to trzy uzupełniające się ścieżki” — wybieraj według zadania, nie hype'u.
 
-- **twój asystent AI do programowania** ładuje plik konfiguracji AI projektu (AGENTS.md) z katalogu użytkownika (`katalog konfiguracji narzędzia AI/AGENTS.md`), katalogu głównego repozytorium oraz każdego podkatalogu, w którym działa agent. Głębsze pliki nadpisują lub uzupełniają pliki położone wyżej.
-- **Codex** i **GitHub Copilot** ładują `AGENTS.md` od bieżącego katalogu w górę — wygrywa najbliższy plik.
-- Jeden kanoniczny plik jest lepszy niż trzy duplikaty. Typowy wzorzec: `AGENTS.md` jako źródło prawdy, plik konfiguracji AI projektu (AGENTS.md) jako cienka nakładka asystenta AI z importem `@AGENTS.md`, `.github/copilot-instructions.md` tylko wtedy, gdy Copilot potrzebuje własnych dodatków. Dowiązanie symboliczne (`ln -s AGENTS.md AGENTS.md`) jest najprostszą deduplikacją, gdy narzędzia wymagają obu nazw.
-- Automatyczna pamięć (np. `katalog konfiguracji narzędzia AI/projects/<dir-with-slashes-as-dashes>/memory/MEMORY.md` twojego asystenta AI do programowania) jest lokalna dla maszyny i nie zastępuje `AGENTS.md`. Reguły wiążące zespół znajdują się w repozytorium; automatyczna pamięć to osobisty cache, okresowo możliwy do przeglądu.
+### Granica dostępu produkcyjnego (minimalne uprawnienia, człowiek przy nieodwracalnych działaniach)
 
-### Hooki wewnętrznej pętli (deterministyczne informacje zwrotne bez promptowania)
+Zarówno CLI, jak i MCP mogą dać agentowi bezpośredni dostęp do produkcji. Lekcja ustanawia domyślną postawę:
 
-Mechaniczne, niepodlegające wyborowi kontrole powinny trafiać do hooków (np. hooka po akcji twojego asystenta AI do programowania), a nie do pliku reguł. Agent kończy edycję; uruchamia się formatter lub szybki lint; wynik wraca jako informacja zwrotna bez przypominania mu o tym. Szablon ustawień (`settings.json.template`) jest dostarczany w pakiecie lekcji jako punkt wejścia konfiguracji. Proceduralne przepływy pracy (głębszy przegląd, lista kontrolna wydania, deploy na sandbox) trzymaj w umiejętnościach, a hooki rezerwuj dla deterministycznych sygnałów narzędziowych.
+- **Tokeny są ograniczone zakresem, nie są kluczami głównymi.** W Cloudflare: token API ograniczony do Pages lub Workers dla jednego projektu, bez DNS, bez Workers Secrets dla niepowiązanych projektów, bez rozliczeń. Odpowiednik AWS / GCP: ograniczona rola IAM z `console-only-user` lub dostępem tylko do odczytu na produkcji, pełnym dostępem na stagingu.
+- **Tokeny znajdują się w zmiennych środowiskowych, nie w `.mcp.json` commitowanym do repozytorium.** Agent pobiera je przez serwer MCP lub wykrywanie zmiennych środowiskowych CLI, a nie przez zwykły tekst w rozmowie.
+- **Niszczące działania są zarezerwowane wyłącznie dla człowieka.** Usunięcie bazy danych, rotacja głównego sekretu, usunięcie projektu — są to operacje wykonywane ręcznie w panelu, nawet jeśli agent je sugeruje. Ręczne kliknięcie kosztuje 30 sekund; sprzątanie po zautomatyzowanym błędzie kosztuje godziny.
 
-### Ścieżki foundation używane przez tę lekcję
+To jest podejście dla MVP. W miarę dojrzewania projektu naturalną ewolucją jest uzyskanie przez staging pełnego dostępu agenta, podczas gdy produkcja staje się tylko do odczytu — omówione w późniejszych modułach.
 
-- `AGENTS.md` / plik konfiguracji AI projektu (AGENTS.md) (oraz warianty dla poszczególnych obszarów) — wynik `/10x-agents-md`
-- `context/foundation/lessons.md` — wynik `/10x-lesson` (rejestr tylko do dopisywania, wykorzystywany przez przyszłe umiejętności planowania/przeglądu)
-- `context/foundation/prd.md`, `context/foundation/tech-stack.md` — dane wejściowe z wcześniejszych lekcji, nadal obecne
-- `docs/reference/contract-surfaces.md` — rejestr nazw mających kluczowe znaczenie (szkielet utworzony przez `/10x-init`)
+### Ścieżki fundamentów używane przez tę lekcję
+
+- `context/foundation/tech-stack.md` — dane wejściowe (przekazanie z Lekcji 2, twarde ograniczenia)
+- `context/foundation/prd.md` — dane wejściowe (przekazanie z Lekcji 1, miękkie wagi)
+- `context/foundation/infrastructure.md` — dane wyjściowe (trzeci kontrakt fundamentowy)
+- `context/deployment/deploy-plan.md` — dane wyjściowe wdrożenia Plan Mode (ścieżka audytu „tego, co miało się wydarzyć”)
+- `context/foundation/lessons.md` — powtarzające się reguły i pułapki (użyj `/10x-lesson` z Lekcji 4, jeśli podczas badań lub wdrożenia zauważysz klasę błędów agenta)
+- `docs/reference/contract-surfaces.md` — rejestr kluczowych nazw
 
 ### Uniwersalny język
 
-Dostarczone umiejętności nie zawierają odniesień do 10xDevs / kohorty / certyfikacji. `/10x-agents-md` wykrywa informacje z repozytorium, w którym jest wywoływane; `/10x-rule-review` jest niezależne od narzędzia i traktuje każdy plik jako „artefakt reguł dla AI”; `/10x-lesson` zapisuje jeden format wpisu niezależnie od domeny projektu. Ćwiczenie kalibracyjne pięciu wzorców ma charakter ilustracyjny — zastąp wzorce wzorcami z własnego stacku.
+Dostarczona umiejętność nie zawiera odniesień do 10xDevs / kohort / certyfikacji. Lista kandydatów na platformę (Cloudflare, Vercel, Netlify, Fly.io, Railway, Render) jest początkową perspektywą badawczą, a nie zestawem rekomendacji — kluczowy jest potok oceniania + wywiadu + kontroli, a platforma nieobecna na domyślnej liście może zostać dodana przez rozszerzenie kroku badawczego. Pięć kryteriów przyjaznych agentom stanowi rzeczywisty rdzeń artefaktu; `/10x-infra-research` ponownie odczytuje je z `references/agent-friendly-criteria.md`, aby ewoluowały wraz z platformami.
 
-Umiejętności nie mogą zapisywać do `context/archive/`. Zarchiwizowane zmiany są niezmienne; jeśli rozstrzygnięta ścieżka docelowa zaczyna się od `context/archive/`, przerwij z komunikatem: „This change is archived. Open a new change with `/10x-new` instead.”
+Umiejętności nie mogą zapisywać do `context/archive/`. Zarchiwizowane zmiany są niezmienne; jeśli rozstrzygnięta ścieżka docelowa zaczyna się od `context/archive/`, przerwij z komunikatem: \"This change is archived. Open a new change with `/10x-new` instead.\"
 
 <!-- END @przeprogramowani/10x-cli -->
 
