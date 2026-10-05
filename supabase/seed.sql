@@ -1,0 +1,6 @@
+-- GiftList local seed (supabase/seed.sql).
+-- config.toml has [db.seed] enabled = true, sql_paths = ["./seed.sql"],
+-- so `supabase db reset` loads this file after migrations. Intentionally
+-- empty for the MVP: the F-01 pgTAP harness creates its own fixtures
+-- inside a rolled-back transaction, so no persistent seed rows are needed.
+-- Add seed data here only if a future slice requires deterministic rows.
