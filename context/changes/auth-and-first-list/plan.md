@@ -275,9 +275,9 @@ Brak migracji — schema i RLS (`gifts_lists`, `insert_lists`, `select_lists`, `
 
 #### Automated
 
-- [x] 2.1 Type checking passes: `npx tsc --noEmit`
-- [x] 2.2 Linting passes: `npx expo lint`
-- [x] 2.3 Pliki auth istnieją: `src/components/auth-form.tsx`, `src/app/(auth)/login.tsx`, `src/app/(auth)/register.tsx`
+- [x] 2.1 Type checking passes: `npx tsc --noEmit` — bc6849c
+- [x] 2.2 Linting passes: `npx expo lint` — bc6849c
+- [x] 2.3 Pliki auth istnieją: `src/components/auth-form.tsx`, `src/app/(auth)/login.tsx`, `src/app/(auth)/register.tsx` — bc6849c
 
 #### Manual
 
