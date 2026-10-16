@@ -23,6 +23,7 @@ import { supabase } from '@/lib/supabase';
 export default function AppIndexScreen() {
   const theme = useTheme();
   const { user } = useSession();
+  const userId = user?.id;
   const [loading, setLoading] = useState(true);
   const [list, setList] = useState<GiftList | null>(null);
   const [name, setName] = useState('');
@@ -30,9 +31,9 @@ export default function AppIndexScreen() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
     let active = true;
-    getMyList(user.id)
+    getMyList(userId)
       .then((data) => {
         if (active) setList(data);
       })
@@ -45,7 +46,7 @@ export default function AppIndexScreen() {
     return () => {
       active = false;
     };
-  }, [user]);
+  }, [userId]);
 
   const handleCreate = async () => {
     if (!user || saving) return;
