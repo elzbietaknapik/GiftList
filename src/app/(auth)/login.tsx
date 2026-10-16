@@ -1,12 +1,20 @@
 import { StyleSheet } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
+import { AuthForm } from '@/components/auth-form';
 import { ThemedView } from '@/components/themed-view';
+import { supabase } from '@/lib/supabase';
 
 export default function LoginScreen() {
+  const handleSubmit = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      throw new Error(error.message);
+    }
+  };
+
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="subtitle">Login</ThemedText>
+      <AuthForm mode="login" onSubmit={handleSubmit} />
     </ThemedView>
   );
 }
@@ -14,7 +22,5 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
