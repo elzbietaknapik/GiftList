@@ -291,14 +291,14 @@ Brak migracji — schema i RLS (`gifts_lists`, `insert_lists`, `select_lists`, `
 
 #### Automated
 
-- [ ] 3.1 Type checking passes: `npx tsc --noEmit`
-- [ ] 3.2 Linting passes: `npx expo lint`
-- [ ] 3.3 Pliki listy istnieją: `src/lib/lists.ts`, `src/app/(app)/index.tsx`
+- [x] 3.1 Type checking passes: `npx tsc --noEmit`
+- [x] 3.2 Linting passes: `npx expo lint`
+- [x] 3.3 Pliki listy istnieją: `src/lib/lists.ts`, `src/app/(app)/index.tsx`
 
 #### Manual
 
-- [ ] 3.4 Nowy użytkownik bez listy → formularz tworzenia; zapis tworzy listę i pokazuje widok z nazwą + pustym stanem
-- [ ] 3.5 Ponowne uruchomienie aplikacji → sesja i lista utrzymane
-- [ ] 3.6 Próba utworzenia drugiej listy nie tworzy duplikatu (unikalny indeks; UI odświeża istniejącą)
-- [ ] 3.7 Wylogowanie → powrót do auth; ponowne logowanie → ta sama lista
-- [ ] 3.8 Pusta nazwa nie zapisuje się (walidacja)
+- [x] 3.4 Nowy użytkownik bez listy → formularz tworzenia; zapis tworzy listę i pokazuje widok z nazwą + pustym stanem
+- [x] 3.5 Ponowne uruchomienie aplikacji → sesja i lista utrzymane
+- [x] 3.6 Próba utworzenia drugiej listy nie tworzy duplikatu (unikalny indeks; UI odświeża istniejącą)
+- [x] 3.7 Wylogowanie → powrót do auth; ponowne logowanie → ta sama lista
+- [x] 3.8 Pusta nazwa nie zapisuje się (walidacja)
