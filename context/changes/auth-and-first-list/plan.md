@@ -267,9 +267,9 @@ Brak migracji — schema i RLS (`gifts_lists`, `insert_lists`, `select_lists`, `
 
 #### Manual
 
-- [ ] 1.4 Aplikacja startuje bez błędu; splash znika; brak sesji pokazuje trasę auth
-- [ ] 1.5 Po ustawieniu sesji obszar przełącza się na `(app)` bez ręcznego przeładowania
-- [ ] 1.6 Brak martwych tras startera (wejście na `/` nie renderuje „Welcome to Expo")
+- [x] 1.4 Aplikacja startuje bez błędu; splash znika; brak sesji pokazuje trasę auth — ca69055
+- [x] 1.5 Po ustawieniu sesji obszar przełącza się na `(app)` bez ręcznego przeładowania — ca69055
+- [x] 1.6 Brak martwych tras startera (wejście na `/` nie renderuje „Welcome to Expo") — ca69055
 
 ### Phase 2: Ekrany rejestracji i logowania
 
@@ -281,24 +281,24 @@ Brak migracji — schema i RLS (`gifts_lists`, `insert_lists`, `select_lists`, `
 
 #### Manual
 
-- [ ] 2.4 Rejestracja nowym e-mailem + hasłem → natychmiastowe zalogowanie i przejście do `(app)`
-- [ ] 2.5 Logowanie istniejącymi danymi → przejście do `(app)`
-- [ ] 2.6 Błędne hasło / nieistniejący e-mail → komunikat inline, brak crasha
-- [ ] 2.7 Puste pola lub hasło < 6 znaków → zablokowane z komunikatem
-- [ ] 2.8 Przełącznik logowanie ↔ rejestracja działa
+- [x] 2.4 Rejestracja nowym e-mailem + hasłem → natychmiastowe zalogowanie i przejście do `(app)` — bc6849c
+- [x] 2.5 Logowanie istniejącymi danymi → przejście do `(app)` — bc6849c
+- [x] 2.6 Błędne hasło / nieistniejący e-mail → komunikat inline, brak crasha — bc6849c
+- [x] 2.7 Puste pola lub hasło < 6 znaków → zablokowane z komunikatem — bc6849c
+- [x] 2.8 Przełącznik logowanie ↔ rejestracja działa — bc6849c
 
 ### Phase 3: Pierwsza lista prezentowa
 
 #### Automated
 
-- [x] 3.1 Type checking passes: `npx tsc --noEmit`
-- [x] 3.2 Linting passes: `npx expo lint`
-- [x] 3.3 Pliki listy istnieją: `src/lib/lists.ts`, `src/app/(app)/index.tsx`
+- [x] 3.1 Type checking passes: `npx tsc --noEmit` — 3d27296
+- [x] 3.2 Linting passes: `npx expo lint` — 3d27296
+- [x] 3.3 Pliki listy istnieją: `src/lib/lists.ts`, `src/app/(app)/index.tsx` — 3d27296
 
 #### Manual
 
-- [x] 3.4 Nowy użytkownik bez listy → formularz tworzenia; zapis tworzy listę i pokazuje widok z nazwą + pustym stanem
-- [x] 3.5 Ponowne uruchomienie aplikacji → sesja i lista utrzymane
-- [x] 3.6 Próba utworzenia drugiej listy nie tworzy duplikatu (unikalny indeks; UI odświeża istniejącą)
-- [x] 3.7 Wylogowanie → powrót do auth; ponowne logowanie → ta sama lista
-- [x] 3.8 Pusta nazwa nie zapisuje się (walidacja)
+- [x] 3.4 Nowy użytkownik bez listy → formularz tworzenia; zapis tworzy listę i pokazuje widok z nazwą + pustym stanem — 3d27296
+- [x] 3.5 Ponowne uruchomienie aplikacji → sesja i lista utrzymane — 3d27296
+- [x] 3.6 Próba utworzenia drugiej listy nie tworzy duplikatu (unikalny indeks; UI odświeża istniejącą) — 3d27296
+- [x] 3.7 Wylogowanie → powrót do auth; ponowne logowanie → ta sama lista — 3d27296
+- [x] 3.8 Pusta nazwa nie zapisuje się (walidacja) — 3d27296
