@@ -359,24 +359,24 @@ Brak migracji danych. Zmiana wartości `primary` w jasnym motywie jest widoczna 
 
 #### Automated
 
-- [x] 2.1 Type checking passes: `npx tsc --noEmit`
-- [x] 2.2 Linting passes: `npx expo lint`
-- [x] 2.3 Pliki `src/components/ui/button.tsx`, `text-field.tsx`, `form-error.tsx` istnieją
-- [x] 2.4 Skan regex na `src/components/ui/` (bez `fontSize`) — 0 trafień
+- [x] 2.1 Type checking passes: `npx tsc --noEmit` — 0da90a0
+- [x] 2.2 Linting passes: `npx expo lint` — 0da90a0
+- [x] 2.3 Pliki `src/components/ui/button.tsx`, `text-field.tsx`, `form-error.tsx` istnieją — 0da90a0
+- [x] 2.4 Skan regex na `src/components/ui/` (bez `fontSize`) — 0 trafień — 0da90a0
 
 #### Manual
 
-- [ ] 2.5 Na webie Tab przechodzi po `TextField` i `Button` z widocznym ringiem
-- [ ] 2.6 Stany `disabled` i `loading` czytelne
+- [x] 2.5 Na webie Tab przechodzi po `TextField` i `Button` z widocznym ringiem — 0da90a0
+- [x] 2.6 Stany `disabled` i `loading` czytelne — 0da90a0
 
 ### Phase 3: Widok listy na prymitywach
 
 #### Automated
 
-- [ ] 3.1 Type checking passes: `npx tsc --noEmit`
-- [ ] 3.2 Linting passes: `npx expo lint`
-- [ ] 3.3 Pliki `src/components/create-list-form.tsx`, `src/components/list-empty-state.tsx` istnieją
-- [ ] 3.4 Skan regex na `index.tsx`, `create-list-form.tsx`, `list-empty-state.tsx` — 0 trafień
+- [x] 3.1 Type checking passes: `npx tsc --noEmit`
+- [x] 3.2 Linting passes: `npx expo lint`
+- [x] 3.3 Pliki listy istnieją: `src/components/create-list-form.tsx`, `src/components/list-empty-state.tsx`, `src/app/(app)/index.tsx`
+- [x] 3.4 Skan regex na `index.tsx`, `create-list-form.tsx`, `list-empty-state.tsx` — 0 trafień
 
 #### Manual
 
