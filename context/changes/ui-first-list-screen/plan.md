@@ -388,24 +388,24 @@ Brak migracji danych. Zmiana wartości `primary` w jasnym motywie jest widoczna 
 
 #### Automated
 
-- [x] 4.1 Type checking passes: `npx tsc --noEmit`
-- [x] 4.2 Linting passes: `npx expo lint`
-- [x] 4.3 Skan regex na `src/components/auth-form.tsx` — 0 trafień
+- [x] 4.1 Type checking passes: `npx tsc --noEmit` — 15e5d12
+- [x] 4.2 Linting passes: `npx expo lint` — 15e5d12
+- [x] 4.3 Skan regex na `src/components/auth-form.tsx` — 0 trafień — 15e5d12
 
 #### Manual
 
-- [ ] 4.4 Login i rejestracja wyglądają jak przed zmianą (porównanie z `before/`)
-- [ ] 4.5 Błędy walidacji: `destructive` przy polu; stan `loading` bez przeskoku layoutu
+- [x] 4.4 Login i rejestracja wyglądają jak przed zmianą (porównanie z `before/`) — 15e5d12
+- [x] 4.5 Błędy walidacji: `destructive` przy polu; stan `loading` bez przeskoku layoutu — 15e5d12
 
 ### Phase 5: Stany, bramka wizualna i reguła
 
 #### Automated
 
-- [ ] 5.1 Type checking passes: `npx tsc --noEmit`
-- [ ] 5.2 Linting passes: `npx expo lint`
-- [ ] 5.3 Skan regex na wszystkich plikach objętych zmianą (z wyjątkami z kryteriów) — 0 trafień
-- [ ] 5.4 `AGENTS.md` zawiera `### UI tokens & components` poza markerami 10x-cli
-- [ ] 5.5 Plik `src/app/dev/ui-states.tsx` istnieje i zwraca `null` poza `__DEV__`
+- [x] 5.1 Type checking passes: `npx tsc --noEmit`
+- [x] 5.2 Linting passes: `npx expo lint`
+- [x] 5.3 Skan regex na wszystkich plikach objętych zmianą (z wyjątkami z kryteriów) — 0 trafień
+- [x] 5.4 `AGENTS.md` zawiera `### UI tokens & components` poza markerami 10x-cli
+- [x] 5.5 Plik `src/app/dev/ui-states.tsx` istnieje i zwraca `null` poza `__DEV__`
 
 #### Manual
 

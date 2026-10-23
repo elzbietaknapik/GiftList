@@ -76,3 +76,10 @@ Expo SDK 57, React Native 0.86, React 19.2, TypeScript `strict: true`. Entrypoin
 
 - Do not edit inside the `<!-- BEGIN/END @przeprogramowani/10x-cli -->` block above — it is managed and re-synced by the 10x-cli tool.
 - Never overwrite `context/` (PRD, plans, hand-offs); it is the source of truth for the bootstrap chain.
+
+### UI tokens & components
+
+- Design tokens (color roles `primary`, `onPrimary`, `destructive`, `ring`, plus `Radius` and `Spacing`) live in `src/constants/theme.ts`.
+- Primitives `Button`, `TextField`, `FormError` live in `src/components/ui/` — check that directory before creating any component.
+- No color literals, arbitrary values, or opacity in views (`src/app/`, `src/components/` except `src/components/ui/` and `constants/theme.ts`).
+- The visual gate for primitives is `src/app/dev/ui-states.tsx` (dev route, returns `null` outside `__DEV__`).
