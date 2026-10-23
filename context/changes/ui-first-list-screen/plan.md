@@ -401,15 +401,15 @@ Brak migracji danych. Zmiana wartości `primary` w jasnym motywie jest widoczna 
 
 #### Automated
 
-- [x] 5.1 Type checking passes: `npx tsc --noEmit`
-- [x] 5.2 Linting passes: `npx expo lint`
-- [x] 5.3 Skan regex na wszystkich plikach objętych zmianą (z wyjątkami z kryteriów) — 0 trafień
-- [x] 5.4 `AGENTS.md` zawiera `### UI tokens & components` poza markerami 10x-cli
-- [x] 5.5 Plik `src/app/dev/ui-states.tsx` istnieje i zwraca `null` poza `__DEV__`
+- [x] 5.1 Type checking passes: `npx tsc --noEmit` — 95cf40c
+- [x] 5.2 Linting passes: `npx expo lint` — 95cf40c
+- [x] 5.3 Skan regex na wszystkich plikach objętych zmianą (z wyjątkami z kryteriów) — 0 trafień — 95cf40c
+- [x] 5.4 `AGENTS.md` zawiera `### UI tokens & components` poza markerami 10x-cli — 95cf40c
+- [x] 5.5 Plik `src/app/dev/ui-states.tsx` istnieje i zwraca `null` poza `__DEV__` — 95cf40c
 
 #### Manual
 
-- [ ] 5.6 Zrzuty kitchen sink desktop i 390 px; porównanie z `before/`
-- [ ] 5.7 Kontrast `ring` ≥3:1 wobec `backgroundElement`; `onPrimary` na `primary` ≥4.5:1 w obu motywach
-- [ ] 5.8 Wszystkie 7 stanów pokazane lub oznaczone N/A z powodem
-- [ ] 5.9 Pełny przepływ rejestracja → lista → wylogowanie bez regresji
+- [x] 5.6 Zrzuty kitchen sink desktop i 390 px; porównanie z `before/` — 95cf40c
+- [x] 5.7 Kontrast `ring` ≥3:1 wobec `backgroundElement`; `onPrimary` na `primary` ≥4.5:1 w obu motywach — 95cf40c
+- [x] 5.8 Wszystkie 7 stanów pokazane lub oznaczone N/A z powodem — 95cf40c
+- [x] 5.9 Pełny przepływ rejestracja → lista → wylogowanie bez regresji — 95cf40c
