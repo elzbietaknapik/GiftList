@@ -41,7 +41,7 @@ Istniejące narzędzia do list życzeń (Amazon Wishlist, Listronic) są zamkni�
 
 | ID    | Change ID                    | Outcome (może …)                                             | Prerequisites | PRD refs              | Status   |
 | ----- | ---------------------------- | ------------------------------------------------------------ | ------------- | --------------------- | -------- |
-| F-01  | reservation-privacy-tests    | (foundation) harness pgTAP dowodzący, że tożsamość rezerwującego nigdy nie wycieka | —             | FR-010, Guardrails    | planning |
+| F-01  | reservation-privacy-tests    | (foundation) harness pgTAP dowodzący, że tożsamość rezerwującego nigdy nie wycieka | —             | FR-010, Guardrails    | done     |
 | S-01  | auth-and-first-list          | użytkownik zarejestrować się/zalogować i mieć własną listę    | —             | FR-001, FR-002, FR-003 | done     |
 | S-02  | add-gift                     | Życzący dodać prezent (nazwa, link, cena, opcjonalnie zdjęcie) | S-01          | FR-005                | proposed |
 | S-03  | share-link-and-guest-access  | udostępnić listę linkiem; gość otworzyć link i zobaczyć listę ze statusami | S-02          | FR-007, FR-008, FR-010 | proposed |
@@ -82,7 +82,7 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 - **Blockers:** —
 - **Unknowns:** — (decyzja o podpięciu do CI pozostaje w Parked)
 - **Risk:** Fałszywe zielone testy, jeśli pgTAP nie działa jako rola `authenticated` (a np. `postgres`); role testowe muszą odwzorowywać właściciela vs. członka (Risk #1 z infra.md).
-- **Status:** planning
+- **Status:** done
 
 ## Slices
 

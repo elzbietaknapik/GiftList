@@ -1,7 +1,7 @@
 # Change: reservation-privacy-tests (F-01)
 
 Roadmap item: **F-01 — Weryfikacja prywatności rezerwacji (harness pgTAP)**.
-Roadmap status: `planning` (see `context/foundation/roadmap.md`).
+Roadmap status: `done` (see `context/foundation/roadmap.md`).
 
 > Minimal identity file. The canonical change contract (`change.md` schema,
 > frontmatter, status lifecycle) is owned by `/10x-new` and is not installed
@@ -28,20 +28,33 @@ Roadmap status: `planning` (see `context/foundation/roadmap.md`).
 - `revert.sql` — manual rollback artifact, kept **out** of
   `supabase/migrations/` (see its header for why; an auto-appplied revert
   there would undo the fix on every `db reset`).
-- `verification.md` — verification record, expected green output, Docker
-  gate, fallbacks, and the DoD checklist mapped to artifacts.
+- `verification.md` — verification record, executed green output, pgTAP
+  overload fix, remaining hosted gate, fallbacks, and the DoD checklist
+  mapped to artifacts.
+- `reviews/impl-review.md` — code review verdict, execution evidence,
+  findings and triage.
 
 ## Execution status
 - **Authoring:** complete (migration + test harness + seed + revert + record).
-- **Execution:** BLOCKED on Docker Desktop, which is not installed / not on
-  PATH (`docker --version` → command not found). `supabase start`,
-  `supabase db reset`, and `supabase test db` cannot run locally until a
-  human installs and starts Docker. The expected green output is fully
-  documented in `verification.md` so a green run can be confirmed the moment
-  Docker is available.
-- **Roadmap F-01 status** stays `planning` until `supabase test db` is green
-  twice (verifying idempotency); flip to `done` after that, then
-  `/10x-archive` can move this folder to `context/archive/`.
+- **Execution:** complete. Docker Desktop is absent on the Windows host, but
+  Docker Engine is available inside WSL; from WSL with Node 20:
+  `supabase db reset` applied both migrations + empty seed, and
+  `supabase test db` was green twice (`Tests=17`, `Result: PASS`). See
+  `verification.md` for the full output.
+- **Test fix during execution:** pgTAP's three-argument
+  `throws_ok(sql, errcode, description)` treats the third argument as
+  `errmsg` when the second is five bytes; switched the three permission-denied
+  assertions to `throws_ok(sql, '42501', NULL, description)`.
+- **Roadmap F-01 status** is `done`. Pushing the migration to the linked
+  hosted project is still a manual step (`supabase login` +
+  `supabase db diff --linked` first); `/10x-archive` can then move this
+  folder to `context/archive/`.
+- **Review:** APPROVE WITH FOLLOW-UPS (`reviews/impl-review.md`). One
+  high-severity hardening item must land before S-04: `anon` still has
+  default-ACL EXECUTE on the RPCs and ALL on `reservation_status` (verified;
+  no identity leak today, but the privilege surface contradicts the
+  least-privilege invariant). Also fix the migration's false "idempotent"
+  claim and add grant-level pgTAP assertions.
 
 ## Out of scope (per plan)
 CI wiring (Parked), behavioral tests (S-03/04/05/06: double-reserve,

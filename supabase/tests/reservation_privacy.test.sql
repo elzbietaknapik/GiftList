@@ -92,7 +92,9 @@ set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated"}', true);
 select is(current_user::text, 'authenticated', '#1 role switched to authenticated (member)');
 select is(auth.uid(), '22222222-2222-2222-2222-222222222222'::uuid, '#2 auth.uid() reads member JWT sub');
-select throws_ok('select reserver_user_id from public.reservations', '42501', '#5 member denied reserver_user_id column');
+-- 4-arg throws_ok with NULL errmsg asserts the SQLSTATE only; the 3-arg form
+-- with a five-byte second argument treats the third argument as errmsg.
+select throws_ok('select reserver_user_id from public.reservations', '42501', NULL, '#5 member denied reserver_user_id column');
 select is(
   (select array_agg(gift_id order by gift_id) from public.reservation_status),
   ARRAY['55555555-5555-5555-5555-555555555555']::uuid[],
@@ -109,7 +111,7 @@ reset role;
 -- reservations (#13).
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}', true);
-select throws_ok('select * from public.reservations', '42501', '#4 owner denied select * from reservations');
+select throws_ok('select * from public.reservations', '42501', NULL, '#4 owner denied select * from reservations');
 select is(
   (select array_agg(gift_id order by gift_id) from public.reservation_status),
   ARRAY['55555555-5555-5555-5555-555555555555']::uuid[],
@@ -146,7 +148,7 @@ reset role;
 
 -- anon block: anon has revoke all + no policy, so the table is fully closed (#3).
 set local role anon;
-select throws_ok('select * from public.reservations', '42501', '#3 anon denied select * from reservations');
+select throws_ok('select * from public.reservations', '42501', NULL, '#3 anon denied select * from reservations');
 reset role;
 
 -- ===== View shape / scoping (run as superuser; reads pg_attribute) =====

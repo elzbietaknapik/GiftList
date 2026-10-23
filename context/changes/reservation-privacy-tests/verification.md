@@ -2,40 +2,59 @@
 
 > Plan source of truth: `plan.md` (copy of
 > `.kilo/plans/1791203567866-reservation-privacy-tests.md`). This record
-> documents the expected green run; the actual run is gated on Docker
-> (see "Execution gate").
+> documents the executed green run and the artifacts it verified.
 
-## Execution gate (blocking)
+## Execution result — PASS (2026-10-23)
 
-Docker is **not** installed / not on PATH on the implementing machine:
+Docker Desktop is not installed on the Windows host, but Docker Engine
+20.10.23 is available inside WSL (`Ubuntu-22.04`) with the local Supabase
+stack already running. The verification was executed from WSL with Node 20
+(`nvm`) against the same checkout:
 
 ```
-> docker --version
-docker : The term 'docker' is not recognized ...
+node -v                     # v20.20.2
+npx supabase@2.121.0 db reset
+npx supabase@2.121.0 test db   # run 1: Result: PASS (Tests=17)
+npx supabase@2.121.0 test db   # run 2: Result: PASS (Tests=17)
 ```
 
-`supabase start` / `supabase db reset` / `supabase test db` all require the
-local Supabase stack, which requires Docker Desktop. Until a human installs
-and starts Docker, the verification commands below cannot run locally.
+`db reset` applied both migrations and the empty seed without error:
 
-This matches Plan Risk #1 ("Docker absent → tests authored but unrunnable")
-and the handover: deliver the migration, the complete test file, and this
-expected-output record. The authored artifacts below are ready; execution
-is the only thing blocked.
+```
+Applying migration 20261005113900_initial_schema.sql...
+Applying migration 20261005153300_reservation_status_scope.sql...
+Seeding data from supabase/seed.sql...
+Finished supabase db reset on branch foundation/reservation-privacy-tests.
+```
 
-## Prereq fixes already applied (Plan Task 3)
+Both `test db` runs produced identical output:
+
+```
+supabase/tests/reservation_privacy.test.sql .. ok
+All tests successful.
+Files=1, Tests=17,  0 wallclock secs
+Result: PASS
+```
+
+The first executed run failed 3 of 17 assertions because of a pgTAP overload
+pitfall: in the three-argument `throws_ok(sql, errcode, description)` form a
+second argument exactly five bytes long is treated as `errcode` and the third
+argument as `errmsg`, so the test description was compared against
+`permission denied for table reservations`. Fixed by using the documented
+four-argument form with `NULL` errmsg:
+`throws_ok(sql, '42501', NULL, description)`. Re-run green twice.
+
+## Prereq fixes applied (Plan Task 3)
 
 - `supabase/seed.sql` created (config.toml has `[db.seed] enabled = true`,
   `sql_paths = ["./seed.sql"]` but no seed file existed; `db reset` would
   have errored on the missing file). It is intentionally empty — the pgTAP
   harness creates its own fixtures inside a rolled-back transaction.
-- Docker Desktop install is a **manual human gate**; it is not something a
-  code change can satisfy.
 
-## Verification commands (run after Docker is up)
+## Verification commands
 
 ```
-npx supabase start          # pulls images first time
+npx supabase start          # stack already running in WSL
 npx supabase db reset       # applies 20261005113900_initial_schema.sql +
                             # 20261005153300_reservation_status_scope.sql,
                             # then loads the (empty) seed
@@ -47,11 +66,10 @@ npx supabase test db
 No `src/` files were touched by this change, so `npx expo lint` /
 `npx tsc --noEmit` are unaffected (run only if `src/` is later modified).
 
-## Expected `supabase db reset` behavior
+## `supabase db reset` behavior (observed)
 
 Migrations apply in timestamp order. The new migration is additive
-(grant + policy + `create or replace view`) and idempotent; it must not
-error and must leave:
+(grant + policy + `create or replace view`) and idempotent; it leaves:
 
 - `reservations` still `revoke all` from `anon, authenticated` (table-level
   closure preserved from the initial migration).
@@ -63,11 +81,11 @@ error and must leave:
 - `reservation_status` re-declared `with (security_invoker = true)` exposing
   only `(gift_id, created_at, purchased_at)`.
 
-## Expected `supabase test db` output (Plan DoD: all 17 green)
+## `supabase test db` assertions (Plan DoD: all 17 green)
 
 pgTAP emits one `ok N - <desc>` per assertion. The TAP sequence number is
 the **execution order** in the test file; the description carries the plan's
-`#N` tag. Expected:
+`#N` tag.
 
 ```
 supabase/tests/reservation_privacy.test.sql ..
@@ -91,12 +109,12 @@ ok 16 - #16 gifts in supabase_realtime
 ok 17 - #17 list_members not in supabase_realtime
 ok
 All tests successful.
-Files=1, Tests=17,  N wallclock secs ( ... )
+Files=1, Tests=17
 Result: PASS
 ```
 
-The second `supabase test db` run must produce the same `Result: PASS` with
-`Tests=17` — proving no cross-run residue (each file runs in its own
+The second `supabase test db` run produced the same `Result: PASS` with
+`Tests=17`, proving no cross-run residue (each file runs in its own
 rolled-back transaction).
 
 ## Why each assertion passes (design reference)
@@ -147,9 +165,9 @@ rolled-back transaction).
 ## DoD checklist (Plan §DoD) — mapped to artifacts
 
 - [x] `supabase/migrations/20261005153300_reservation_status_scope.sql`
-      exists; applied by `supabase db reset` (expected; pending Docker run).
+      exists; applied by `supabase db reset` (verified green).
 - [x] `supabase/tests/reservation_privacy.test.sql` exists; `plan(17)`
-      matches the 17 assertions; green run expected (pending Docker).
+      matches the 17 assertions; green twice on a freshly reset DB.
 - [x] `anon`/`authenticated` still cannot read `reservations`
       (`select *` → 42501) — asserted by #3, #4, #5.
 - [x] `reservation_status` works for owners/members, leaks no identity and
@@ -161,14 +179,16 @@ rolled-back transaction).
 
 ## Risks carried forward
 
-- **Risk #1 (Docker absent)** — unblocked by installing Docker Desktop; this
-  record makes the green run verifiable as soon as Docker is available.
+- **Risk #1 (Docker absent on Windows host)** — resolved for execution by
+  using Docker Engine inside WSL. Local CLI verification must run from WSL
+  (`npx supabase ...`); the Windows shell alone still has no Docker.
 - **Risk #2 (false green)** — mitigated by sanity assertions #1–#2 at the top
   of the member identity block; a broken switch fails loudly.
 - **Risk #3 (schema/grant drift vs hosted)** — the repair is additive
-  (grant + policy + `create or replace view`); after Docker is up, run
-  `npx supabase db diff --linked` to confirm no unexpected diff before
-  pushing to the linked hosted project.
+  (grant + policy + `create or replace view`). `npx supabase db diff --linked`
+  could not be run here because the CLI has no access token
+  (`supabase login` / `SUPABASE_ACCESS_TOKEN` is a manual gate). Run it before
+  pushing the migration to the linked hosted project.
 - **Risk #5 (seed file missing)** — resolved by adding `supabase/seed.sql`.
 - **Risk #6 (`plan(N)` drift)** — count is pinned to 17 and comments call out
   keeping it in sync; pgTAP fails loudly on mismatch.
