@@ -3,7 +3,7 @@ project: "GiftList"
 version: 1
 status: draft
 created: 2026-10-05
-updated: 2026-10-16
+updated: 2026-10-23
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -43,7 +43,7 @@ Istniejące narzędzia do list życzeń (Amazon Wishlist, Listronic) są zamkni�
 | ----- | ---------------------------- | ------------------------------------------------------------ | ------------- | --------------------- | -------- |
 | F-01  | reservation-privacy-tests    | (foundation) harness pgTAP dowodzący, że tożsamość rezerwującego nigdy nie wycieka | —             | FR-010, Guardrails    | done     |
 | S-01  | auth-and-first-list          | użytkownik zarejestrować się/zalogować i mieć własną listę    | —             | FR-001, FR-002, FR-003 | done     |
-| S-02  | add-gift                     | Życzący dodać prezent (nazwa, link, cena, opcjonalnie zdjęcie) | S-01          | FR-005                | proposed |
+| S-02  | add-gift                     | Życzący dodać prezent (nazwa, link, cena, opcjonalnie zdjęcie) | S-01          | FR-005                | done     |
 | S-03  | share-link-and-guest-access  | udostępnić listę linkiem; gość otworzyć link i zobaczyć listę ze statusami | S-02          | FR-007, FR-008, FR-010 | proposed |
 | S-04  | reserve-gift-hidden-identity | Obdarowujący zarezerwować wolny prezent; status widoczny natychmiast, tożsamość ukryta | S-03, F-01    | US-01, FR-009, FR-010 | proposed |
 | S-05  | mark-gift-purchased          | rezerwujący oznaczyć zarezerwowany prezent jako zrealizowany | S-04          | FR-011                | proposed |
@@ -108,7 +108,7 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Walidacja danych wejściowych (link, cena ≥ 0); zdjęcie tylko jako URL — brak decyzji storage (poza zakresem MVP).
-- **Status:** proposed
+- **Status:** done
 
 ### S-03: Link udostępniania i widok gościa
 
@@ -164,8 +164,8 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 | ---------- | ---------------------------- | -------------------------------------------------------- | --------------------- | ----- |
 | F-01       | reservation-privacy-tests    | RLS: pakiet pgTAP dowodzący ukrycia tożsamości rezerwującego | yes                   | Run `/10x-plan reservation-privacy-tests` — odblokowuje S-04 |
 | S-01       | auth-and-first-list          | Rejestracja/logowanie + pierwsza lista użytkownika        | yes                   | Run `/10x-plan auth-and-first-list` |
-| S-02       | add-gift                     | Dodawanie prezentów do listy                             | no                    | czeka na S-01 |
-| S-03       | share-link-and-guest-access  | Link udostępniania i widok listy dla gościa               | no                    | czeka na S-02 |
+| S-02       | add-gift                     | Dodawanie prezentów do listy                             | no                    | done — zrealizowane (FR-005) |
+| S-03       | share-link-and-guest-access  | Link udostępniania i widok listy dla gościa               | yes                   | S-02 done — gotowe do `/10x-plan` |
 | S-04       | reserve-gift-hidden-identity | Rezerwacja prezentu z ukrytą tożsamością                 | no                    | gwiazda przewodnia; czeka na S-03, F-01 |
 | S-05       | mark-gift-purchased          | Oznaczanie rezerwacji jako zrealizowanej                 | no                    | czeka na S-04 |
 | S-06       | protected-deletes            | Usuwanie listy/prezentu z ochroną rezerwacji             | no                    | czeka na S-04 |

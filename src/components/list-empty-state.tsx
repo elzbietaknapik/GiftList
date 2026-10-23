@@ -6,9 +6,9 @@ import { Spacing } from '@/constants/theme';
 export function ListEmptyState() {
   return (
     <View style={styles.emptyState}>
-      <ThemedText type="default">Twoja lista jest jeszcze pusta.</ThemedText>
+      <ThemedText type="default">Nie dodano jeszcze prezentów.</ThemedText>
       <ThemedText themeColor="textSecondary" style={styles.emptyHint}>
-        Dodawanie prezentów w kolejnym kroku.
+        Dodaj pierwszy prezent w formularzu powyżej.
       </ThemedText>
     </View>
   );
@@ -16,9 +16,7 @@ export function ListEmptyState() {
 
 const styles = StyleSheet.create({
   emptyState: {
-    flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
     gap: Spacing.two,
   },
   emptyHint: {
