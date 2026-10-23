@@ -373,24 +373,24 @@ Brak migracji danych. Zmiana wartości `primary` w jasnym motywie jest widoczna 
 
 #### Automated
 
-- [x] 3.1 Type checking passes: `npx tsc --noEmit`
-- [x] 3.2 Linting passes: `npx expo lint`
-- [x] 3.3 Pliki listy istnieją: `src/components/create-list-form.tsx`, `src/components/list-empty-state.tsx`, `src/app/(app)/index.tsx`
-- [x] 3.4 Skan regex na `index.tsx`, `create-list-form.tsx`, `list-empty-state.tsx` — 0 trafień
+- [x] 3.1 Type checking passes: `npx tsc --noEmit` — 81ba006
+- [x] 3.2 Linting passes: `npx expo lint` — 81ba006
+- [x] 3.3 Pliki listy istnieją: `src/components/create-list-form.tsx`, `src/components/list-empty-state.tsx`, `src/app/(app)/index.tsx` — 81ba006
+- [x] 3.4 Skan regex na `index.tsx`, `create-list-form.tsx`, `list-empty-state.tsx` — 0 trafień — 81ba006
 
 #### Manual
 
-- [ ] 3.5 Pusta nazwa → błąd przy polu i brak zapisu
-- [ ] 3.6 Zapis listy → widok z nazwą i pustym stanem; ponowne uruchomienie zachowuje listę
-- [ ] 3.7 Wylogowanie wraca do auth; wygląd poprawny w jasnym i ciemnym motywie
+- [x] 3.5 Pusta nazwa → błąd przy polu i brak zapisu — 81ba006
+- [x] 3.6 Zapis listy → widok z nazwą i pustym stanem; ponowne uruchomienie zachowuje listę — 81ba006
+- [x] 3.7 Wylogowanie wraca do auth; wygląd poprawny w jasnym i ciemnym motywie — 81ba006
 
 ### Phase 4: Migracja auth-form na prymitywy
 
 #### Automated
 
-- [ ] 4.1 Type checking passes: `npx tsc --noEmit`
-- [ ] 4.2 Linting passes: `npx expo lint`
-- [ ] 4.3 Skan regex na `src/components/auth-form.tsx` — 0 trafień
+- [x] 4.1 Type checking passes: `npx tsc --noEmit`
+- [x] 4.2 Linting passes: `npx expo lint`
+- [x] 4.3 Skan regex na `src/components/auth-form.tsx` — 0 trafień
 
 #### Manual
 

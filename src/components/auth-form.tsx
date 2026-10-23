@@ -1,19 +1,13 @@
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 
+import { Button } from '@/components/ui/button';
+import { FormError } from '@/components/ui/form-error';
+import { TextField } from '@/components/ui/text-field';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
 
 type AuthFormProps = {
   mode: 'login' | 'register';
@@ -21,11 +15,11 @@ type AuthFormProps = {
 };
 
 export function AuthForm({ mode, onSubmit }: AuthFormProps) {
-  const theme = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [hasValidationError, setHasValidationError] = useState(false);
 
   const isLogin = mode === 'login';
   const title = isLogin ? 'Zaloguj się' : 'Zarejestruj się';
@@ -52,15 +46,18 @@ export function AuthForm({ mode, onSubmit }: AuthFormProps) {
     const validationError = validate();
     if (validationError) {
       setError(validationError);
+      setHasValidationError(true);
       return;
     }
     setError(null);
+    setHasValidationError(false);
     setSubmitting(true);
     try {
       await onSubmit(email.trim(), password);
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Coś poszło nie tak. Spróbuj ponownie.';
       setError(message);
+      setHasValidationError(false);
     } finally {
       setSubmitting(false);
     }
@@ -76,53 +73,37 @@ export function AuthForm({ mode, onSubmit }: AuthFormProps) {
           {title}
         </ThemedText>
 
-        <ThemedView type="backgroundElement" style={styles.field}>
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            placeholder="E-mail"
-            placeholderTextColor={theme.textSecondary}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoComplete="email"
-            autoCorrect={false}
-            style={[styles.input, { color: theme.text }]}
-          />
-        </ThemedView>
+        <TextField
+          value={email}
+          onChangeText={setEmail}
+          placeholder="E-mail"
+          keyboardType="email-address"
+          autoComplete="email"
+          autoCapitalize="none"
+          autoCorrect={false}
+          invalid={hasValidationError}
+          errorId="auth-error"
+          style={{ marginBottom: Spacing.three }}
+        />
 
-        <ThemedView type="backgroundElement" style={styles.field}>
-          <TextInput
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Hasło"
-            placeholderTextColor={theme.textSecondary}
-            secureTextEntry
-            autoCapitalize="none"
-            style={[styles.input, { color: theme.text }]}
-          />
-        </ThemedView>
+        <TextField
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Hasło"
+          secureTextEntry
+          autoCapitalize="none"
+          invalid={hasValidationError}
+          errorId="auth-error"
+          style={{ marginBottom: Spacing.three }}
+        />
 
         {error ? (
-          <ThemedText style={[styles.error, styles.errorText]}>{error}</ThemedText>
+          <View style={styles.errorWrapper}>
+            <FormError nativeID="auth-error">{error}</FormError>
+          </View>
         ) : null}
 
-        <Pressable
-          onPress={handleSubmit}
-          disabled={submitting}
-          style={({ pressed }) => [
-            styles.button,
-            pressed && styles.buttonPressed,
-            submitting && styles.buttonDisabled,
-          ]}
-        >
-          {submitting ? (
-            <ActivityIndicator color="#ffffff" />
-          ) : (
-            <ThemedText type="smallBold" style={styles.buttonText}>
-              {submitLabel}
-            </ThemedText>
-          )}
-        </Pressable>
+        <Button label={submitLabel} onPress={handleSubmit} loading={submitting} />
 
         <View style={styles.switchRow}>
           <ThemedText themeColor="textSecondary">{switchQuestion}</ThemedText>
@@ -148,37 +129,8 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.five,
     textAlign: 'center',
   },
-  field: {
-    borderRadius: Spacing.two,
+  errorWrapper: {
     marginBottom: Spacing.three,
-  },
-  input: {
-    paddingVertical: Spacing.three,
-    paddingHorizontal: Spacing.three,
-    fontSize: 16,
-  },
-  error: {
-    marginBottom: Spacing.three,
-    textAlign: 'center',
-  },
-  errorText: {
-    color: '#d92d20',
-  },
-  button: {
-    backgroundColor: '#3c87f7',
-    borderRadius: Spacing.two,
-    paddingVertical: Spacing.three,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonPressed: {
-    opacity: 0.8,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: '#ffffff',
   },
   switchRow: {
     flexDirection: 'row',
