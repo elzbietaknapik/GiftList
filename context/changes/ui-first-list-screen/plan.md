@@ -345,24 +345,24 @@ Brak migracji danych. Zmiana wartości `primary` w jasnym motywie jest widoczna 
 
 #### Automated
 
-- [x] 1.1 Type checking passes: `npx tsc --noEmit`
-- [x] 1.2 Linting passes: `npx expo lint`
-- [x] 1.3 Role `primary`, `onPrimary`, `destructive`, `ring` w obu motywach oraz eksport `Radius` w `src/constants/theme.ts`
-- [x] 1.4 Brak literału `#3c87f7` w `src/components/themed-text.tsx`
+- [x] 1.1 Type checking passes: `npx tsc --noEmit` — 6f87bed
+- [x] 1.2 Linting passes: `npx expo lint` — 6f87bed
+- [x] 1.3 Role `primary`, `onPrimary`, `destructive`, `ring` w obu motywach oraz eksport `Radius` w `src/constants/theme.ts` — 6f87bed
+- [x] 1.4 Brak literału `#3c87f7` w `src/components/themed-text.tsx` — 6f87bed
 
 #### Manual
 
-- [ ] 1.5 Zrzuty „przed” login i index zapisane w `context/changes/ui-first-list-screen/screenshots/before/`
-- [ ] 1.6 Linki „Zarejestruj się” / „Zaloguj się” widoczne w obu motywach
+- [x] 1.5 Zrzuty „przed” login i index zapisane w `context/changes/ui-first-list-screen/screenshots/before/` — 6f87bed
+- [x] 1.6 Linki „Zarejestruj się” / „Zaloguj się” widoczne w obu motywach — 6f87bed
 
 ### Phase 2: Wspólne prymitywy UI
 
 #### Automated
 
-- [ ] 2.1 Type checking passes: `npx tsc --noEmit`
-- [ ] 2.2 Linting passes: `npx expo lint`
-- [ ] 2.3 Pliki `src/components/ui/button.tsx`, `text-field.tsx`, `form-error.tsx` istnieją
-- [ ] 2.4 Skan regex na `src/components/ui/` (bez `fontSize`) — 0 trafień
+- [x] 2.1 Type checking passes: `npx tsc --noEmit`
+- [x] 2.2 Linting passes: `npx expo lint`
+- [x] 2.3 Pliki `src/components/ui/button.tsx`, `text-field.tsx`, `form-error.tsx` istnieją
+- [x] 2.4 Skan regex na `src/components/ui/` (bez `fontSize`) — 0 trafień
 
 #### Manual
 
