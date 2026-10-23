@@ -1,7 +1,7 @@
 ---
 change_id: ui-first-list-screen
 title: Ui first list screen
-status: implementing
+status: implemented
 created: 2026-10-23
 updated: 2026-10-23
 archived_at: null
