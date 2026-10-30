@@ -18,11 +18,19 @@ export function SessionProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     let active = true;
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (!active) return;
-      setSession(data.session);
-      setLoading(false);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data, error }) => {
+        if (error) console.error(error);
+        if (!active) return;
+        setSession(data.session);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        if (!active) return;
+        setLoading(false);
+      });
 
     const { data } = supabase.auth.onAuthStateChange((_event, currentSession) => {
       if (!active) return;
