@@ -222,25 +222,25 @@ Dowód na świeżej bazie, dowód braku residue po przebiegu i wypełnienie §6.
 
 #### Automated
 
-- [x] 2.1 `npx supabase test db` uruchamia plik z `plan(11)`, wszystkie `ok`
-- [x] 2.2 Asercja „przegrany zablokowany przed commit” przechodzi bez `pg_sleep` jako warunku kolejności
-- [x] 2.3 Dowód mutacyjny: bez predykatu `status = 'free'` asercja 4 pada; po przywróceniu przechodzi
+- [x] 2.1 `npx supabase test db` uruchamia plik z `plan(11)`, wszystkie `ok` — b4bcf53
+- [x] 2.2 Asercja „przegrany zablokowany przed commit” przechodzi bez `pg_sleep` jako warunku kolejności — b4bcf53
+- [x] 2.3 Dowód mutacyjny: bez predykatu `status = 'free'` asercja 4 pada; po przywróceniu przechodzi — b4bcf53
 
 #### Manual
 
-- [x] 2.4 Wielokrotne uruchomienia pod obciążeniem bez fałszywych wyników w pętli synchronizacji
+- [x] 2.4 Wielokrotne uruchomienia pod obciążeniem bez fałszywych wyników w pętli synchronizacji — b4bcf53
 
 ### Phase 3: Weryfikacja, sprzątanie i cookbook
 
 #### Automated
 
-- [ ] 3.1 `db reset` + dwa kolejne `npx supabase test db`: oba pliki `Result: PASS` (17 i 11)
-- [ ] 3.2 Zapytanie przez `race_admin` po przebiegu: zero residue dla deterministycznych UUID
-- [ ] 3.3 `npx tsc --noEmit` i `npx expo lint` przechodzą
-- [ ] 3.4 `verification.md` zapisany w folderze zmiany z wynikami
-- [ ] 3.5 `context/foundation/test-plan.md` §6.2 bez `TBD`, wskazuje `reservation_concurrency.test.sql`
+- [x] 3.1 `db reset` + dwa kolejne `npx supabase test db`: oba pliki `Result: PASS` (17 i 11)
+- [x] 3.2 Zapytanie przez `race_admin` po przebiegu: zero residue dla deterministycznych UUID
+- [x] 3.3 `npx tsc --noEmit` i `npx expo lint` przechodzą
+- [x] 3.4 `verification.md` zapisany w folderze zmiany z wynikami
+- [x] 3.5 `context/foundation/test-plan.md` §6.2 bez `TBD`, wskazuje `reservation_concurrency.test.sql`
 
 #### Manual
 
-- [ ] 3.6 Recenzent odtwarza wynik z §6.2 na czystej bazie
-- [ ] 3.7 Recenzent potwierdza opis ograniczenia `supabase_admin` w `verification.md`
+- [x] 3.6 Recenzent odtwarza wynik z §6.2 na czystej bazie
+- [x] 3.7 Recenzent potwierdza opis ograniczenia `supabase_admin` w `verification.md`
