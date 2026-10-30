@@ -234,13 +234,13 @@ Dowód na świeżej bazie, dowód braku residue po przebiegu i wypełnienie §6.
 
 #### Automated
 
-- [x] 3.1 `db reset` + dwa kolejne `npx supabase test db`: oba pliki `Result: PASS` (17 i 11)
-- [x] 3.2 Zapytanie przez `race_admin` po przebiegu: zero residue dla deterministycznych UUID
-- [x] 3.3 `npx tsc --noEmit` i `npx expo lint` przechodzą
-- [x] 3.4 `verification.md` zapisany w folderze zmiany z wynikami
-- [x] 3.5 `context/foundation/test-plan.md` §6.2 bez `TBD`, wskazuje `reservation_concurrency.test.sql`
+- [x] 3.1 `db reset` + dwa kolejne `npx supabase test db`: oba pliki `Result: PASS` (17 i 11) — 0c62e40
+- [x] 3.2 Zapytanie przez `race_admin` po przebiegu: zero residue dla deterministycznych UUID — 0c62e40
+- [x] 3.3 `npx tsc --noEmit` i `npx expo lint` przechodzą — 0c62e40
+- [x] 3.4 `verification.md` zapisany w folderze zmiany z wynikami — 0c62e40
+- [x] 3.5 `context/foundation/test-plan.md` §6.2 bez `TBD`, wskazuje `reservation_concurrency.test.sql` — 0c62e40
 
 #### Manual
 
-- [x] 3.6 Recenzent odtwarza wynik z §6.2 na czystej bazie
-- [x] 3.7 Recenzent potwierdza opis ograniczenia `supabase_admin` w `verification.md`
+- [x] 3.6 Recenzent odtwarza wynik z §6.2 na czystej bazie — 0c62e40
+- [x] 3.7 Recenzent potwierdza opis ograniczenia `supabase_admin` w `verification.md` — 0c62e40
