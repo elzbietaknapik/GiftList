@@ -214,21 +214,21 @@ Dowód na świeżej bazie, dowód braku residue po przebiegu i wypełnienie §6.
 
 #### Automated
 
-- [x] 1.1 Plik `supabase/tests/reservation_concurrency.test.sql` istnieje; brak zmian w `supabase/migrations/`
-- [x] 1.2 `npx supabase db reset` przechodzi po dodaniu pliku
-- [x] 1.3 Połączenia `race_admin` i `race_b` otwierają się bez błędu
+- [x] 1.1 Plik `supabase/tests/reservation_concurrency.test.sql` istnieje; brak zmian w `supabase/migrations/` — 13ef81b
+- [x] 1.2 `npx supabase db reset` przechodzi po dodaniu pliku — 13ef81b
+- [x] 1.3 Połączenia `race_admin` i `race_b` otwierają się bez błędu — 13ef81b
 
 ### Phase 2: Asercje wyścigu i odmowy
 
 #### Automated
 
-- [ ] 2.1 `npx supabase test db` uruchamia plik z `plan(11)`, wszystkie `ok`
-- [ ] 2.2 Asercja „przegrany zablokowany przed commit” przechodzi bez `pg_sleep` jako warunku kolejności
-- [ ] 2.3 Dowód mutacyjny: bez predykatu `status = 'free'` asercja 4 pada; po przywróceniu przechodzi
+- [x] 2.1 `npx supabase test db` uruchamia plik z `plan(11)`, wszystkie `ok`
+- [x] 2.2 Asercja „przegrany zablokowany przed commit” przechodzi bez `pg_sleep` jako warunku kolejności
+- [x] 2.3 Dowód mutacyjny: bez predykatu `status = 'free'` asercja 4 pada; po przywróceniu przechodzi
 
 #### Manual
 
-- [ ] 2.4 Wielokrotne uruchomienia pod obciążeniem bez fałszywych wyników w pętli synchronizacji
+- [x] 2.4 Wielokrotne uruchomienia pod obciążeniem bez fałszywych wyników w pętli synchronizacji
 
 ### Phase 3: Weryfikacja, sprzątanie i cookbook
 
