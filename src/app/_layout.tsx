@@ -3,6 +3,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme } from 'react-native';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import { ShareLinkProvider } from '@/lib/share-link-provider';
 import { SessionProvider, useSession } from '@/lib/session';
 
 SplashScreen.preventAutoHideAsync();
@@ -31,8 +32,10 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <SessionProvider>
-        <AnimatedSplashOverlay />
-        <RootNavigator />
+        <ShareLinkProvider>
+          <AnimatedSplashOverlay />
+          <RootNavigator />
+        </ShareLinkProvider>
       </SessionProvider>
     </ThemeProvider>
   );

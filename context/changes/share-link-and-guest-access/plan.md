@@ -353,20 +353,20 @@ Trasa `/list/[token]` dla zalogowanego gościa: dołącza do listy przez RPC, po
 ### Phase 3: Owner share link on the list screen
 
 #### Automated
-- [x] 3.1 `npx tsc --noEmit` passes
-- [x] 3.2 `npx expo lint` passes
-- [x] 3.3 `src/components/share-link-card.tsx` exists and is mounted in `src/app/(app)/index.tsx`
+- [x] 3.1 `npx tsc --noEmit` passes — aa6e39b
+- [x] 3.2 `npx expo lint` passes — aa6e39b
+- [x] 3.3 `src/components/share-link-card.tsx` exists and is mounted in `src/app/(app)/index.tsx` — aa6e39b
 
 #### Manual
-- [x] 3.4 Owner sees `giftlist://list/<uuid>` matching `share_token`
-- [x] 3.5 “Udostępnij” opens the native share sheet with the link
+- [x] 3.4 Owner sees `giftlist://list/<uuid>` matching `share_token` — aa6e39b
+- [x] 3.5 “Udostępnij” opens the native share sheet with the link — aa6e39b
 
 ### Phase 4: Deep-link capture and pending token across login
 
 #### Automated
-- [ ] 4.1 `npx tsc --noEmit` passes
-- [ ] 4.2 `npx expo lint` passes
-- [ ] 4.3 `src/lib/share-link.tsx` exists; root layout mounts `ShareLinkProvider` inside `SessionProvider`
+- [x] 4.1 `npx tsc --noEmit` passes
+- [x] 4.2 `npx expo lint` passes
+- [x] 4.3 `src/lib/share-link.tsx` exists; root layout mounts `ShareLinkProvider` inside `SessionProvider`
 
 #### Manual
 - [ ] 4.4 Logged-in user opens link with app running — no crash, routed to guest view (complete with Phase 5)
