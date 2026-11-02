@@ -364,27 +364,27 @@ Trasa `/list/[token]` dla zalogowanego gościa: dołącza do listy przez RPC, po
 ### Phase 4: Deep-link capture and pending token across login
 
 #### Automated
-- [x] 4.1 `npx tsc --noEmit` passes
-- [x] 4.2 `npx expo lint` passes
-- [x] 4.3 `src/lib/share-link.tsx` exists; root layout mounts `ShareLinkProvider` inside `SessionProvider`
+- [x] 4.1 `npx tsc --noEmit` passes — bef2539
+- [x] 4.2 `npx expo lint` passes — bef2539
+- [x] 4.3 `src/lib/share-link.tsx` exists; root layout mounts `ShareLinkProvider` inside `SessionProvider` — bef2539
 
 #### Manual
-- [ ] 4.4 Logged-in user opens link with app running — no crash, routed to guest view (complete with Phase 5)
-- [ ] 4.5 Logged-in user opens link on cold start — no crash, routed to guest view (complete with Phase 5)
-- [ ] 4.6 Logged-out user opens link → login; after login routed to `/list/<token>` (complete with Phase 5)
+- [x] 4.4 Logged-in user opens link with app running — no crash, routed to guest view (complete with Phase 5)
+- [x] 4.5 Logged-in user opens link on cold start — no crash, routed to guest view (complete with Phase 5)
+- [x] 4.6 Logged-out user opens link → login; after login routed to `/list/<token>` (complete with Phase 5)
 
 ### Phase 5: Guest view — shared list with statuses
 
 #### Automated
-- [ ] 5.1 `npx tsc --noEmit` passes (after typed routes regenerated)
-- [ ] 5.2 `npx expo lint` passes
-- [ ] 5.3 `src/app/(app)/list/[token].tsx` exists and does not import `supabase` directly
+- [x] 5.1 `npx tsc --noEmit` passes (after typed routes regenerated)
+- [x] 5.2 `npx expo lint` passes
+- [x] 5.3 `src/app/(app)/list/[token].tsx` exists and does not import `supabase` directly
 
 #### Manual
-- [ ] 5.4 Guest sees list name and all gifts with “Wolny” / “Zarezerwowany” / “Zrealizowany” statuses
-- [ ] 5.5 Invalid token shows “Nieprawidłowy link.” without crash
-- [ ] 5.6 Non-existent valid UUID shows “Nie znaleziono listy.”
-- [ ] 5.7 No reserver identity shown anywhere in the guest view
+- [x] 5.4 Guest sees list name and all gifts with “Wolny” / “Zarezerwowany” / “Zrealizowany” statuses
+- [x] 5.5 Invalid token shows “Nieprawidłowy link.” without crash
+- [x] 5.6 Non-existent valid UUID shows “Nie znaleziono listy.”
+- [x] 5.7 No reserver identity shown anywhere in the guest view
 
 ## References
 
