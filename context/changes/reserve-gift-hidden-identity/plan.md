@@ -269,16 +269,16 @@ Zweryfikować przepływ dwoma kontami, wyścig oraz brak wycieku tożsamości, a
 ### Phase 4: End-to-end verification
 
 #### Automated
-- [x] 4.1 `npx tsc --noEmit` passes on the final tree
-- [x] 4.2 `npx expo lint` passes on the final tree
+- [x] 4.1 `npx tsc --noEmit` passes on the final tree — 65510ad
+- [x] 4.2 `npx expo lint` passes on the final tree — 65510ad
 - [ ] 4.3 `supabase test db` passes without changes to `supabase/tests/` (requires `supabase start`)
 
 #### Manual
-- [x] 4.4 Owner opening own link sees no “Zarezerwuj” button
-- [x] 4.5 Two guest accounts on one free gift: second attempt shows the conflict message and refreshed status
-- [x] 4.6 Rapid double tap on “Zarezerwuj” sends one RPC call
-- [x] 4.7 No view (owner, guest, messages) shows the reserver identity
-- [x] 4.8 Account without membership gets “Nie masz dostępu do tej listy.”
+- [x] 4.4 Owner opening own link sees no “Zarezerwuj” button — 65510ad
+- [x] 4.5 Two guest accounts on one free gift: second attempt shows the conflict message and refreshed status — 65510ad
+- [x] 4.6 Rapid double tap on “Zarezerwuj” sends one RPC call — 65510ad
+- [x] 4.7 No view (owner, guest, messages) shows the reserver identity — 65510ad
+- [x] 4.8 Account without membership gets “Nie masz dostępu do tej listy.” — 65510ad
 
 ## References
 
