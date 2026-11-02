@@ -1,48 +1,26 @@
 <!-- BEGIN @przeprogramowani/10x-cli -->
 
-## Zestaw narzędzi AI 10xDevs - Moduł 2, Lekcja 1
+## Zestaw narzędzi AI 10xDevs — Moduł 4, Lekcja 1 (Kontekst na dużą skalę)
 
-Przejdź od konfiguracji sprint-zero do orkiestracji projektu za pomocą **łańcucha roadmapy**:
+Ten plik reguł powinien być zwięzły i wskazywać na kontekst znajdujący się gdzie indziej. Duży codebase nie potrzebuje większego pliku głównego.
 
 ```
-(Module 1 foundation docs) -> /10x-roadmap -> backlog-ready roadmap items
+lean root rules file -> context/ (system of record) -> per-module rules only when a trigger signal appears
 ```
 
-`/10x-roadmap` jest głównym tematem lekcji. `/10x-new` jest celowo wprowadzane w Module 2, Lesson 2, gdy wybrany element roadmapy staje się folderem zmiany implementacyjnej.
-
-### Router zadań - Od czego zacząć
+### Router zadań — od czego zacząć
 
 | Umiejętność | Użyj jej, gdy |
 | --- | --- |
-| **Roadmapa (główny temat lekcji)** | |
-| `/10x-roadmap` | Masz `context/foundation/prd.md` oraz bazę projektu ze szkieletem i potrzebujesz roadmapy MVP z podejściem vertical-first. Umiejętność odczytuje PRD, sprawdza bazę kodu, korzysta z dostępnych dokumentów fundamentowych, takich jak `tech-stack.md`, `infrastructure.md` i `deploy-plan.md`, a następnie zapisuje `context/foundation/roadmap.md`. Użyj jej PRZED tworzeniem folderów dla poszczególnych zmian lub planów implementacji. |
-| **Ponownie uruchom wcześniejsze kroki, jeśli to konieczne** | |
-| `/10x-shape` / `/10x-prd` / `/10x-tech-stack-selector` / `/10x-bootstrapper` / `/10x-agents-md` / `/10x-infra-research` | Zebrane z Module 1, aby kontrakty fundamentowe można było poprawić przed sekwencjonowaniem roadmapy. Jeśli generowanie roadmapy ujawni lukę w PRD, popraw PRD, zanim uznasz, że backlog jest gotowy. |
+| `/10x-agents-md` -> `/10x-rule-review` | Odchudzasz rozbudowany główny plik reguł: przenieś szczegóły do `context/` i pozostaw wskaźnik. |
+| `/10x-ray <skill> [args]` | Chcesz zobaczyć, jak działa umiejętność: mapuje ona kroki umiejętności, rozgałęzienia i bramki wymagające udziału człowieka, następnie ją uruchamia i wyjaśnia każdy krok w trakcie jego wykonywania. Dodaj `--mode html`, aby obserwować w przeglądarce. |
+| `/10x-lesson` | Błąd agenta, który stale wraca, powinien stać się zapisaną lekcją, a nie kolejną linią w tym pliku. |
 
-### Jak łańcuch przekazuje dalej
+### Twarde reguły
 
-- `/10x-roadmap` łączy produkt z implementacją. Nie wybiera frameworków, nie projektuje schematów ani nie pisze planu implementacji dla poszczególnych zmian.
-- Wynikiem jest `context/foundation/roadmap.md`: uporządkowane kamienie milowe, vertical slices, ograniczone fundamenty, zależności, niewiadome, ryzyko oraz pola przekazania do backlogu.
-- Elementy roadmapy powinny otrzymać stabilne, czytelne dla człowieka identyfikatory w narzędziach backlogu. Właściwy folder `context/changes/<change-id>/` jest tworzony w Lesson 2 za pomocą `/10x-new`.
-
-### Granice roadmapy
-
-- Domyślnie stosuj vertical slices: widoczne dla użytkownika rezultaty obejmujące UI, dane, logikę biznesową i integracje.
-- Praca horyzontalna jest dozwolona wyłącznie jako ograniczony enabler, który wskazuje odblokowywany przez siebie późniejszy pionowy kamień milowy.
-- Unikaj osieroconej pracy horyzontalnej, takiej jak „zbuduj całą bazę danych”, „zbuduj wszystkie endpointy API” lub „zaprojektuj całe UI” przed pierwszym widocznym dla użytkownika przepływem.
-- Roadmapa nie jest estymacją kalendarzową. Nie wymyślaj dat, story points ani velocity sprintu, chyba że użytkownik wyraźnie prosi o osobny artefakt planistyczny.
-
-### Ścieżki fundamentów używane przez tę lekcję
-
-- `context/foundation/prd.md` - wejście
-- `context/foundation/tech-stack.md` - opcjonalne wejście
-- `context/foundation/infrastructure.md` - opcjonalne wejście
-- `context/deployment/deploy-plan.md` - opcjonalne wejście
-- `context/foundation/roadmap.md` - wyjście
-- `context/foundation/lessons.md` - powtarzające się reguły i pułapki
-- `docs/reference/contract-surfaces.md` - rejestr kluczowych nazw
-
-Umiejętności nie mogą zapisywać do `context/archive/`. Zarchiwizowane zmiany są niezmienne; jeśli rozstrzygnięta ścieżka docelowa zaczyna się od `context/archive/`, przerwij z komunikatem: "This change is archived. Open a new change with `/10x-new` instead."
+- **Pliki instrukcji sumują się; nie nadpisują się.** Narzędzia łączą pliki główne, zagnieżdżone i na poziomie użytkownika. Nie powtarzaj tej samej reguły na kilku poziomach.
+- **Test włączenia.** Linia należy tutaj tylko wtedy, gdy agent popełniłby bez niej błąd. Fakty, które agent może odczytać z kodu lub z `context/`, pozostają tam i otrzymują wskaźnik.
+- **Dodawaj strukturę per-module tylko wtedy, gdy pojawi się sygnał.** Przykłady: agent stale myli dwa obszary albo konwencje jednego modułu wypierają wszystko inne. Sam rozmiar repozytorium nie jest sygnałem.
 
 <!-- END @przeprogramowani/10x-cli -->
 

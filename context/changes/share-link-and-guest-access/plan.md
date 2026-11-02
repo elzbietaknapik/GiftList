@@ -1,260 +1,396 @@
-# Plan: S-03 `share-link-and-guest-access`
+# Share Link and Guest Access — Implementation Plan
 
-Roadmap item: **S-03 — Link udostępniania i widok gościa** (Change ID `share-link-and-guest-access`)
-Sources:
-- `context/changes/share-link-and-guest-access/expo-linking-research.md`
-- `context/changes/share-link-and-guest-access/navigation-auth-research.md`
+## Overview
 
-Goal (roadmap.md:115): Życzący może wygenerować link udostępniania; Obdarowujący po otwarciu linka i zalogowaniu widzi listę ze statusami (wolny/zarezerwowany/zrealizowany).
+Dostarczyć S-03 (roadmap: `context/foundation/roadmap.md`, Change ID `share-link-and-guest-access`): Życzący kopiuje/udostępnia link `giftlist://list/<share_token>` ze swojej listy; Obdarowujący otwiera link, loguje się i widzi listę prezentów z ich statusami (Wolny / Zarezerwowany / Zrealizowany). Dane idą przez istniejącą RPC `open_shared_list(p_token)` i istniejący odczyt `listGifts`. Bez zmian w schemacie bazy.
 
-> **Language note:** comments in commit/PR text may be Polish to match the repo; identifiers stay as-is.
+Ten plan zastępuje poprzednią wersję, która blokowała Fazę 4 zależnością od S-02. S-02 (`add-gift`) jest już `done` (`src/lib/gifts.ts`, `src/components/gift-list.tsx`), więc cały zakres jest wykonalny.
 
-> **Blocker (from roadmap + research):** S-03 has `Prerequisites: S-02` (roadmap.md:118), and **S-02 (`add-gift`) is not implemented** (`Status: proposed`, roadmap.md:46 / 101–111; navigation-auth-research.md:39–48). There is **no gift-items view and no `src/lib/gifts.ts`** to share. Phase 4 (guest view) is therefore **BLOCKED** and is specified only to the extent the research supports; everything S-02-dependent is left in **Open Questions**. Phases 1–3 (native config, share-link emission, deep-link capture through auth) do **not** depend on S-02 and can proceed.
+Źródła: `context/changes/share-link-and-guest-access/expo-linking-research.md`, `…/navigation-auth-research.md`, `context/foundation/roadmap.md` (S-03, lines 113–123), `context/foundation/prd.md` (FR-007, FR-008, FR-010).
 
-## Decisions locked for this plan (each with its research source)
+> **Ograniczenia zakresu:** skupienie na działającym kodzie UI i zapytaniach do bazy. Bez testów E2E w Playwright, bez scaffoldingu testowego, bez nowych runnerów. Weryfikacja: `npx tsc --noEmit`, `npx expo lint`, kontrole manualne.
 
-| # | Decision | Source |
-|---|----------|--------|
-| D1 | Custom scheme `giftlist://` **requires a Development Build** (`expo-dev-client`); it does not work in standard Expo Go. | `expo-linking-research.md:3` (decision), `:73–75` (build steps) |
-| D2 | Use the **`useLinkingURL()`** hook (`useURL()` is deprecated) plus `addEventListener('url')` + `getInitialURL()` for links arriving while the app runs. | `expo-linking-research.md:12`, `:16–33`, `:35–48` |
-| D3 | Parse with **`Linking.parse(url)` → `{ hostname, path, queryParams }`**; for `giftlist://list/<token>`, `hostname === 'list'` and the **token is `path`** (a path segment, not a query param). | `expo-linking-research.md:13–14` |
-| D4 | Register the scheme by setting `"scheme": "giftlist"` in `app.json` (currently the placeholder `"bootstrapscaffold"`) and add `expo-dev-client`; scheme is build-time only. | `expo-linking-research.md:54–75`; `navigation-auth-research.md:85–86` |
-| D5 | Hook deep-link listening in the **root layout `src/app/_layout.tsx`**, as a provider/hook mounted **inside `SessionProvider`** — the only place above `Stack.Protected` and with `useSession()` access. | `navigation-auth-research.md:18–24` |
-| D6 | The auth decision for an unauthenticated guest must read **`useSession().session`** and be taken only after `loading === false`. | `navigation-auth-research.md:28–35` |
-| D7 | An unauthenticated guest is redirected to `(auth)` by `Stack.Protected guard={!session}`; therefore the incoming token must be **buffered ("pending") before the redirect and consumed after login**. | `navigation-auth-research.md:18–24` |
-| D8 | DB token is a **UUID**: `gifts_lists.share_token uuid unique`; the guest path is the RPC **`open_shared_list(p_token uuid)`**, which is granted **only to `authenticated`** ⇒ the guest **must log in** (FR-008) before the list is visible. | `navigation-auth-research.md:51–59` |
+## Current State Analysis
 
-## Current state (verified)
+- **Owner screen:** `src/app/(app)/index.tsx` ładuje listę (`getMyList`, `:31`) i prezenty (`listGifts`, `:51`); renderuje `AddGiftForm` i `GiftList` w `ScrollView` (`:91–105`). Brak elementu udostępniania.
+- **Dane prezentów:** `src/lib/gifts.ts:91–102` — `listGifts(listId)`, kolumny `GIFT_COLUMNS` (`:25`). Typ `GiftStatus = 'free' | 'reserved' | 'purchased'` (`:3`).
+- **Dane listy:** `src/lib/lists.ts` — `GiftList` zawiera `share_token: string` (`:6`); `getMyList` (`:17–28`), `createList` (`:30–49`). Brak funkcji `openSharedList`.
+- **Root layout:** `src/app/_layout.tsx:29–38` — `ThemeProvider` → `SessionProvider` → `AnimatedSplashOverlay` + `RootNavigator`; `RootNavigator` zwraca `null` przy `loading` (`:13–15`) i używa `Stack.Protected guard={!session}` → `(auth)` oraz `guard={!!session}` → `(app)` (`:18–25`).
+- **Konfiguracja natywna:** `app.json:8` — `"scheme": "bootstrapscaffold"` (placeholder); `plugins` (`:26–36`) bez `expo-dev-client`; `experiments.typedRoutes: true` (`:38`). Brak `eas.json`. `expo-linking` jest zainstalowany (`package.json:15`), `expo-dev-client` nie.
+- **Baza:**
+  - `gifts_lists.share_token uuid not null default gen_random_uuid() unique` (`supabase/migrations/20261005113900_initial_schema.sql:8`) — token już istnieje dla każdej listy.
+  - RLS `select_gifts` (`:64–68`) — właściciel i członek listy czytają `gifts`, w tym kolumnę `status`.
+  - RPC `open_shared_list(p_token uuid)` (`:96–102`) — `security definer`, wstawia `list_members` (`on conflict do nothing`) i zwraca wiersz `gifts_lists`; grant tylko `authenticated` (`:135–138`).
+  - Tabela `reservations` jest zamknięta dla klienta (`:85`); status czytany z `gifts.status` nie ujawnia rezerwującego, więc widok gościa nie potrzebuje `reservation_status`.
+- **Brak test runnera** w scope tego zadania (zgodnie z ograniczeniem użytkownika).
 
-- Navigation (navigation-auth-research.md:6–16): root `src/app/_layout.tsx:29–37` wraps `SessionProvider` + `RootNavigator` with `Stack.Protected guard={!session}` → `(auth)` and `guard={!!session}` → `(app)`; `(auth)/_layout.tsx` = `Slot`; `(app)/_layout.tsx` = `Stack`; only `(app)/index.tsx` exists.
-- Auth (navigation-auth-research.md:28–35): `src/lib/session.tsx` exposes `{ session, user, loading }` via `useSession()`.
-- app.json (navigation-auth-research.md:61–87): `"scheme": "bootstrapscaffold"`, plugins `["expo-router", ["expo-splash-screen", …]]`, `experiments: { typedRoutes, reactCompiler }`; **no `expo-dev-client`**.
-- Dependencies (verified in repo): `expo-linking` `~57.0.11` **is already installed** (`package.json:15`); `expo-dev-client` is **not** installed. `eas.json` **does not exist**.
-- DB (navigation-auth-research.md:49–59): `share_token uuid unique` (`supabase/migrations/20261005113900_initial_schema.sql:8`); RPC `open_shared_list` (`:96–102`); `reservation_status` view (`:89–93`, re-scoped in `20261005153300_reservation_status_scope.sql`).
-- Owner data layer (navigation-auth-research.md:45): `src/lib/lists.ts` — `GiftList` already carries `share_token: string` (`lists.ts:6`).
-- Missing (S-02): no `src/lib/gifts.ts`, no gift-items screen, no gift/status UI (`(app)/index.tsx:99–105` shows only an empty state with "Dodawanie prezentów w kolejnym kroku").
+### Key Discoveries
+
+- Token jest UUID — walidować przed wywołaniem RPC (`navigation-auth-research.md:51–59`).
+- Protected routes przekierowują niezalogowanego gościa do `(auth)` — token musi być zbuforowany przed redirectem (`navigation-auth-research.md:18–24`, D7).
+- `Linking.parse('giftlist://list/<token>')` daje `hostname = 'list'`, `path = '<token>'` (`expo-linking-research.md:12–14`, D3).
+- Expo Router routuje deep link automatycznie do istniejącej trasy; hook służy tylko do logiki tokenu, nie do nawigacji (`expo-linking-research.md:50–52`).
+- `open_shared_list` jest idempotentne (`on conflict do nothing`), więc ponowne otwarcie linku jest bezpieczne.
+- Zmiana `scheme` w `app.json` wymaga nowego development build; hot reload nie wystarczy (`expo-linking-research.md:73–75`).
 
 ## What We're NOT Doing
 
-- **No gift-view implementation here if it belongs to S-02** — the read model and gift/status UI are S-02 deliverables; see Open Question O1 (navigation-auth-research.md:39–48).
-- No reservations/realtime (S-04), no mark-purchased (S-05), no protected deletes (S-06).
-- No DB migrations — schema + RPC + `reservation_status` already exist (navigation-auth-research.md:51–59). No edits to applied migrations.
-- No OAuth/magic-link/auth changes; the existing email+password auth is reused unchanged (navigation-auth-research.md:28–35).
-- No `service_role` or server code; only public `EXPO_PUBLIC_*`.
-- No test runner or CI (roadmap Parked).
-- Do not build the guest view against assumed gift fields — the gift read contract comes from S-02 (Open Question O1).
+- Rezerwacji prezentu i akcji „Zarezerwuj” (S-04) — widok gościa jest tylko do odczytu.
+- Realtime i odświeżania statusów na żywo — status jest pobierany przy otwarciu ekranu (S-04 wprowadzi Realtime).
+- Oznaczania jako zrealizowany (S-05) i usuwania z ochroną (S-06).
+- Regeneracji / unieważniania linku — `share_token` jest stały (decyzja użytkownika).
+- Migracji DB, zmian w istniejących migracjach i polityk RLS.
+- Zmian w logowaniu (OAuth, magic link, reset hasła) — email + hasło bez zmian.
+- `service_role`, kodu serwerowego, Edge Functions.
+- Testów E2E w Playwright, testów jednostkowych, scaffoldingu testowego i CI (decyzja użytkownika; `package.json` zawiera `vitest`/`@playwright/test`, ale nie dodajemy ani nie uruchamiamy testów w tym zakresie).
+- Trwałego zapisu oczekującego tokenu między zabiciem aplikacji a logowaniem (decyzja: tylko w pamięci).
+- Publikacji linków Universal/App Links ani wdrożenia web (format linku to custom scheme).
+- Konfiguracji EAS (`eas.json`) i buildów w chmurze.
+- Zmiany `name`/`slug` w `app.json` (kosmetyka, poza zakresem linku).
 
-## Critical implementation details
+## Implementation Approach
 
-- **Order of guards vs. parsing:** the root layout returns `null` while `loading` (navigation-auth-research.md:12–13). The deep-link provider must therefore live **inside** the `loading` gate's parent but must not itself block on session — it captures the URL regardless of auth state and holds it as `pendingToken` until `session` appears (D7).
-- **Expo Router already routes deep links** to screens automatically; the custom hook/listener is needed only for the token logic (validation + `open_shared_list`), not for navigation (expo-linking-research.md:50–52). Do not duplicate routing.
-- **Typed routes** (`experiments.typedRoutes`, navigation-auth-research.md:80) — after adding any new route file, regenerate `.expo/types/` (brief `npx expo start`) before `tsc`, else typed `href` may fail (pattern from S-01 plan).
-- **Scheme is build-time:** after editing `app.json` a **new Development Build** is required; hot reload alone will not register `giftlist://` (expo-linking-research.md:54, 73–75).
+Pięć faz, od konfiguracji natywnej, przez warstwę danych, do UI właściciela i gościa. Logika tokenu (walidacja, parsowanie, bufor) żyje w `src/lib/`; ekrany tylko wywołują funkcje z `src/lib/` i renderują stan. Pojedyncza trasa `src/app/(app)/list/[token].tsx` obsługuje gościa; przechwytywanie linku jest w providerze w root layout, a przekierowanie po zalogowaniu — w `(app)/_layout.tsx`.
 
----
+Decyzje podjęte bez pytania (zgodne z wzorcami repo):
+- Widok właściciela pokazuje URL jako tekst i akcję `Share` z `react-native` — bez nowej zależności (np. `expo-clipboard`).
+- Widok gościa reużywa `GiftList` (`src/components/gift-list.tsx`) bez akcji rezerwacji.
+- Wszystkie kolory/odstępy przez `useTheme`, `ThemedText`, `ThemedView`, `Spacing`, `Radius` (`AGENTS.md`).
 
-## Phase 1 — Native config: scheme + development build
+## Critical Implementation Details
 
-### Overview
-Register the `giftlist` scheme and add `expo-dev-client` so a custom-scheme deep link can actually be delivered (D1, D4).
-
-### Changes Required
-
-#### 1. `app.json` — scheme and dev client
-**File:** `app.json`
-**Intent:** Replace the placeholder scheme and enable the development client.
-**Contract:** set `expo.scheme` to `"giftlist"` and add `"expo-dev-client"` to `expo.plugins` (keep `expo-router` and the `expo-splash-screen` entry). Shape per source:
-```json
-{
-  "expo": {
-    "scheme": "giftlist",
-    "plugins": ["expo-router", "expo-dev-client"]
-  }
-}
-```
-Source: `expo-linking-research.md:59–71` (exact fragment), `navigation-auth-research.md:85–86` (current placeholder + missing plugin).
-**Out of scope here:** `name`/`slug` cosmetic rename — not required for the link (navigation-auth-research.md:87).
-
-#### 2. Install dev-client and produce a development build
-**Intent:** `expo-dev-client` must be installed and a native build produced.
-**Contract:** `npx expo install expo-dev-client`, then build a development build (`npx expo run:android|ios` or `eas build --profile development`).
-Source: `expo-linking-research.md:73–75`.
-**Open:** which build path applies given there is **no `eas.json`** — see Open Question O2.
-
-### Success Criteria
-- **Automated:** `npx tsc --noEmit` and `npx expo lint` pass; `app.json` contains `"scheme": "giftlist"` and `expo-dev-client` in `plugins`.
-- **Manual:** a development build installs on a device/emulator; opening `giftlist://` (any path) launches the app (not Expo Go).
-
-### Implementation Note
-Per S-01 convention, stop after automated verification for manual confirmation before Phase 2.
+- **Warunek bufora:** provider przechwytuje token tylko, gdy `loading === false` i `session === null`. Zalogowany użytkownik jest kierowany przez Expo Router bezpośrednio, więc token nie może być też zbuforowany — inaczej nastąpi podwójna nawigacja.
+- **Kolejność w RPC:** najpierw `openSharedList(token)` (dodaje członkostwo), dopiero potem `listGifts(list.id)`. `select_gifts` zwraca wiersze tylko dla członków — odwrotna kolejność da pustą listę bez błędu.
+- **Pusty wynik RPC:** dla nieistniejącego tokenu PostgREST zwraca `data = null` bez błędu. `openSharedList` musi rzucić własny błąd „Nie znaleziono listy.”, inaczej gość zobaczy pusty ekran zamiast komunikatu.
+- **Typed routes:** po dodaniu `src/app/(app)/list/[token].tsx` uruchom `npx expo start` raz, aby wygenerować `.expo/types/`, przed `npx tsc --noEmit` (wzorzec S-01).
+- **Scheme jest czasem budowania:** po zmianie `app.json` konieczny jest nowy `npx expo run:android|ios` (nie Expo Go).
+- **Manualne kontrole deep linków (4.4–4.6):** przekierowanie kończy się na trasie z Fazy 5, więc są wykonywane łącznie z kontrolami Fazy 5.
 
 ---
 
-## Phase 2 — Share-link emission (owner side)
+## Phase 1: Native config — scheme and development build
 
 ### Overview
-Let Życzący obtain a `giftlist://list/<token>` link from their existing list.
 
-### Changes Required
+Zarejestrować scheme `giftlist` i dodać `expo-dev-client`, aby link `giftlist://` dostarczał się do zbudowanej aplikacji.
 
-#### 1. Share-link helper
-**File:** `src/lib/share-link.ts` (new)
-**Intent:** Single place that builds the share URL from a list's `share_token`.
-**Contract:** `buildShareUrl(shareToken: string): string` returning the literal form `giftlist://list/<share_token>`.
-Source: `expo-linking-research.md:14` (defines the `giftlist://list/<token>` shape) and `navigation-auth-research.md:45` (`GiftList.share_token` exists, `lists.ts:6`).
-**Note:** whether to build the string literally or via `Linking.createURL('/list/<token>')` is **not settled by the research** — Open Question O3.
+### Changes Required:
 
-#### 2. Share UI on the owner screen
-**File:** `src/app/(app)/index.tsx`
-**Intent:** Show the share link for the existing list (only when `list` is present).
-**Contract:** when `list` exists, render the built URL and a copy/share action; do not add gift rendering (that is S-02). Reuses existing `list` state (`(app)/index.tsx:28`).
-**Dependency note:** the owner already has `list.share_token` from S-01 (`src/lib/lists.ts:6`), so this phase is not blocked by S-02.
+#### 1. App configuration
 
-### Success Criteria
-- **Automated:** `npx tsc --noEmit`, `npx expo lint`; file `src/lib/share-link.ts` exists.
-- **Manual:** logged-in owner sees a link of the form `giftlist://list/<uuid>`; the token matches `gifts_lists.share_token`.
+**File**: `app.json`
+
+**Intent**: Zastąpić placeholder scheme i włączyć development client, bez zmiany pozostałych wpisów konfiguracji.
+
+**Contract**: `expo.scheme` = `"giftlist"`; `expo.plugins` zawiera `"expo-dev-client"` obok `"expo-router"` i wpisu `expo-splash-screen` (zachowany bez zmian). Source: `expo-linking-research.md:59–71`; `app.json:8, 26–36`.
+
+#### 2. Dependency and development build
+
+**File**: `package.json`, `package-lock.json` (przez npm)
+
+**Intent**: Dodać `expo-dev-client` w SDK-zgodnej wersji i wygenerować lokalny development build.
+
+**Contract**: `npx expo install expo-dev-client` (nie `npm install`); build lokalny `npx expo run:android` lub `npx expo run:ios` (wymagane lokalne toolchain: Android Studio lub Xcode). Nie edytować ręcznie katalogów `ios/` ani `android/` (generowane, gitignorowane).
+
+### Success Criteria:
+
+#### Automated Verification:
+
+- `npx tsc --noEmit` przechodzi
+- `npx expo lint` przechodzi
+- `app.json` zawiera `"scheme": "giftlist"` i `"expo-dev-client"` w `plugins`
+
+#### Manual Verification:
+
+- Development build instaluje się na urządzeniu lub emulatorze
+- Otwarcie `giftlist://` (dowolna ścieżka) uruchamia aplikację (nie Expo Go)
+
+**Implementation Note**: Po zakończeniu automatycznej weryfikacji zatrzymaj się na potwierdzenie manualne przed Fazą 2.
 
 ---
 
-## Phase 3 — Deep-link capture and token-through-auth
+## Phase 2: Data layer — share URL and shared-list access
 
 ### Overview
-Capture incoming `giftlist://list/<token>` links at the root, buffer the token across the auth gate, and hand it to the guest flow once a session exists (D2, D3, D5, D6, D7).
 
-### Changes Required
+Dodać czyste funkcje tworzenia i parsowania linku oraz wywołanie RPC `open_shared_list`. Bez UI.
 
-#### 1. Share-link provider / hook
-**File:** `src/lib/share-link.tsx` (new) — mounted inside `SessionProvider` in the root layout.
-**Intent:** One owner of "the pending shared token", surviving the redirect to `(auth)`.
-**Contract:**
-- Subscribe with `Linking.useLinkingURL()` (preferred) **and** `Linking.getInitialURL()` + `Linking.addEventListener('url', …)` for the already-running case; unsubscribe on cleanup.
-- Parse with `Linking.parse(url)`; accept a token only when `hostname === 'list'` and `path` is non-empty; otherwise ignore.
-- Expose state `{ pendingToken: string | null, clearPendingToken() }`.
-- Do **not** act on the token itself; authentication/consumption happens after `session` is known.
-Source: `expo-linking-research.md:12, 16–33, 35–48` (API), `:13–14` (parse shape), `navigation-auth-research.md:18–24` (buffer-before-redirect).
+### Changes Required:
+
+#### 1. Share-link helpers
+
+**File**: `src/lib/share-link.ts` (nowy)
+
+**Intent**: Jedno miejsce budujące URL udostępniania i walidujące token, używane przez właściciela, providera deep linków i widok gościa.
+
+**Contract**:
+- `buildShareUrl(shareToken: string): string` → `giftlist://list/<shareToken>` (literalnie; patrz Open Question O3 zamkniętą jako decyzja w tym planie).
+- `isShareToken(value: string): boolean` — dopasowanie UUID (case-insensitive) do wzorca 8-4-4-4-12.
+- `parseShareToken(url: string): string | null` — `Linking.parse(url)`; zwraca token tylko, gdy `hostname === 'list'`, `path` jest niepusty i `isShareToken(path)`; w przeciwnym razie `null`.
+Source: `expo-linking-research.md:12–14`; `navigation-auth-research.md:51–59`.
+
+#### 2. Open shared list (RPC)
+
+**File**: `src/lib/lists.ts`
+
+**Intent**: Dodać wywołanie RPC, które dołącza zalogowanego gościa do listy i zwraca ją; wzorzec jak w `getMyList`.
+
+**Contract**: `openSharedList(token: string): Promise<GiftList>` wywołuje `supabase.rpc('open_shared_list', { p_token: token })`; przy `error` rzuca `new Error(error.message)` (wzorzec `:24–26`); przy `data === null` rzuca `new Error('Nie znaleziono listy.')`; zwraca obiekt zmapowany do pól `GiftList` (`id`, `name`, `share_token`, `created_at`), bo RPC zwraca też `owner_id`. Source: `initial_schema.sql:96–102, 135–138`.
+
+### Success Criteria:
+
+#### Automated Verification:
+
+- `npx tsc --noEmit` przechodzi
+- `npx expo lint` przechodzi
+- `src/lib/share-link.ts` eksportuje `buildShareUrl`, `isShareToken`, `parseShareToken`
+- `src/lib/lists.ts` eksportuje `openSharedList`
+
+#### Manual Verification:
+
+- Brak (warstwa czysta; weryfikowana przez UI w fazach 3 i 5)
+
+---
+
+## Phase 3: Owner share link on the list screen
+
+### Overview
+
+Właściciel widzi link swojej listy na ekranie i może go udostępnić przez natywny arkusz udostępniania.
+
+### Changes Required:
+
+#### 1. Share link card
+
+**File**: `src/components/share-link-card.tsx` (nowy)
+
+**Intent**: Mały komponent prezentacyjny: etykieta, URL jako zaznaczalny tekst i przycisk „Udostępnij”.
+
+**Contract**: props `{ shareToken: string }`; URL = `buildShareUrl(shareToken)`; przycisk używa `Button` z `src/components/ui/button.tsx` i wywołuje `Share.share({ message: url })` z `react-native`; błąd udostępniania pokazywany przez `FormError` (nie połykany). Styl przez `ThemedView type="backgroundElement"`, `ThemedText`, `Radius`, `Spacing`; bez literałów kolorów.
+
+#### 2. Mount on owner screen
+
+**File**: `src/app/(app)/index.tsx`
+
+**Intent**: Pokazać kartę linku nad formularzem prezentu, tylko gdy lista istnieje.
+
+**Contract**: w bloku `{list ? (…) : …}` (`:91–105`) dodać `<ShareLinkCard shareToken={list.share_token} />` jako pierwszy element `ScrollView`, przed `AddGiftForm`. Bez zmian w logice ładowania (`:28–64`).
+
+### Success Criteria:
+
+#### Automated Verification:
+
+- `npx tsc --noEmit` przechodzi
+- `npx expo lint` przechodzi
+- Plik `src/components/share-link-card.tsx` istnieje i jest importowany w `src/app/(app)/index.tsx`
+
+#### Manual Verification:
+
+- Zalogowany właściciel widzi link `giftlist://list/<uuid>`, gdzie `<uuid>` = `gifts_lists.share_token`
+- Przycisk „Udostępnij” otwiera natywny arkusz udostępniania z tym linkiem
+
+---
+
+## Phase 4: Deep-link capture and pending token across login
+
+### Overview
+
+Przechwycić przychodzący `giftlist://list/<token>` w root layout, zbuforować token w pamięci, gdy użytkownik nie jest zalogowany, i przekazać go do trasy gościa po zalogowaniu.
+
+### Changes Required:
+
+#### 1. Share-link provider
+
+**File**: `src/lib/share-link.tsx` (nowy)
+
+**Intent**: Jeden właściciel stanu „oczekującego tokenu”, który przetrwa przekierowanie do `(auth)`.
+
+**Contract**:
+- `ShareLinkProvider({ children })` używa `useSession()` (`src/lib/session.tsx`) oraz `Linking.useLinkingURL()` (obsługuje link początkowy i link przychodzący gdy aplikacja działa; nie używać przestarzałego `useURL`).
+- Efekt: gdy `loading === false`, `session === null`, a URL nie jest `null` — `parseShareToken(url)`; jeśli zwraca token, zapisz w stanie `pendingToken`.
+- Eksportuje hook `useShareLink()` zwracający `{ pendingToken: string | null, clearPendingToken: () => void }`; hook rzuca błąd poza providerem (wzorzec `useSession`).
+- Nie wykonuje żadnej nawigacji ani wywołania RPC.
+Source: `expo-linking-research.md:12, 16–33`; `navigation-auth-research.md:18–24, 28–35`.
 
 #### 2. Root layout wiring
-**File:** `src/app/_layout.tsx`
-**Intent:** Mount the provider inside `SessionProvider` so it sees the URL regardless of which route group is active.
-**Contract:** keep `ThemeProvider` → `SessionProvider` → (ShareLinkProvider) → `AnimatedSplashOverlay` + `RootNavigator`; leave the `Stack.Protected` guards unchanged (`_layout.tsx:18–25`).
-Source: `navigation-auth-research.md:10–11, 18–24`.
 
-#### 3. Consume the token after login (gate only)
-**File:** `src/lib/share-link.tsx`
-**Intent:** When `loading === false` and `session` exists and `pendingToken` is set, the token is ready to be handed to the guest flow.
-**Contract:** expose the pending token to a consumer that (a) validates it as a UUID and (b) calls `open_shared_list(p_token)`. The **UI/route** that consumes it is Phase 4 and is S-02-dependent.
-Source: `navigation-auth-research.md:34–35` (session gate), `:51–59` (RPC + uuid + must-login).
+**File**: `src/app/_layout.tsx`
 
-### Success Criteria
-- **Automated:** `npx tsc --noEmit`, `npx expo lint`; files `src/lib/share-link.tsx` exists; root layout mounts the provider.
-- **Manual:**
-  - Logged-in user opens `giftlist://list/<uuid>` → app opens, token captured (no crash).
-  - **Logged-out** user opens the link → routed to `(auth)`; after logging in, the pending token is still available (buffer survives the redirect — D7).
+**Intent**: Zamontować provider wewnątrz `SessionProvider`, aby widział URL niezależnie od aktywnej grupy tras.
 
----
+**Contract**: `SessionProvider` → `ShareLinkProvider` → (`AnimatedSplashOverlay` + `RootNavigator`); guardy `Stack.Protected` (`:18–25`) bez zmian.
 
-## Phase 4 — Guest view (BLOCKED by S-02)
+#### 3. Redirect after login
 
-> **Status: BLOCKED. Do not implement against assumed gift fields.** The read model and the gift/status view are S-02 deliverables that do not exist yet (navigation-auth-research.md:39–48; roadmap.md:101–111). This phase is described only to the depth the research supports; the missing pieces are Open Questions, not guesses.
+**File**: `src/app/(app)/_layout.tsx`
 
-### Overview (only what is established)
-On an incoming shared token and a confirmed session, the guest calls `open_shared_list(p_token)` to become a member and obtain the list, then views the list **with statuses** (FR-010).
+**Intent**: Gdy po zalogowaniu istnieje oczekujący token, przekierować do widoku gościa i wyczyścić bufor.
 
-### Established contract
-- **RPC:** `open_shared_list(p_token uuid)` — inserts the caller into `list_members` and returns the `gifts_lists` row; executable **only by `authenticated`**, so the guest must be logged in (D8).
-- **Token:** a `uuid` (not an opaque string) — validate before calling the RPC.
-- **Statuses source:** the `reservation_status` view exists and is identity-free (FR-010).
-Source: `navigation-auth-research.md:49–59`.
+**Contract**: efekt w `(app)/_layout.tsx` (mounted tylko gdy `session` istnieje): jeśli `pendingToken` nie jest `null` — `clearPendingToken()` i `router.push({ pathname: '/list/[token]', params: { token: pendingToken } })`. Wyczyszczenie przed push zapobiega ponownemu przekierowaniu.
 
-### Not established (→ Open Questions)
-- Which **route/screen** hosts the guest view (and its path) — not decided by the research (O4).
-- The **gift read model** (`src/lib/gifts.ts`), the gift/status UI component, and the status rendering itself — S-02 (O1).
-- What the guest sees for FR-007 "generate a link" versus FR-008 "open a link" on the owner/guest split — the research only covers the guest-open path (O5).
+### Success Criteria:
 
-### Success Criteria (pending O1/O4)
-- **Manual (only after O1/O4 resolved):** logged-in guest opens `giftlist://list/<uuid>` → becomes a member → sees the list and the free/reserved/purchased statuses, with no reserver identity shown (FR-010).
+#### Automated Verification:
+
+- `npx tsc --noEmit` przechodzi
+- `npx expo lint` przechodzi
+- Plik `src/lib/share-link.tsx` istnieje; `src/app/_layout.tsx` zawiera `ShareLinkProvider` wewnątrz `SessionProvider`
+
+#### Manual Verification:
+
+- Zalogowany użytkownik otwiera link przy działającej aplikacji — aplikacja otwiera się bez awarii, widok gościa pokazuje listę (kontrola wykonywana łącznie z Fazą 5)
+- Zalogowany użytkownik otwiera link przy zimnym starcie — brak awarii, przejście do widoku gościa (łącznie z Fazą 5)
+- Niezalogowany użytkownik otwiera link — trafia na ekran logowania; po zalogowaniu aplikacja przechodzi do `/list/<token>` (łącznie z Fazą 5)
+
+**Implementation Note**: Kontrole manualne 4.4–4.6 wymagają trasy z Fazy 5 jako celu przekierowania. Wykonaj je po zakończeniu Fazy 5; po automatycznej weryfikacji Fazy 4 zatrzymaj się na potwierdzenie.
 
 ---
 
-## DoD (achievable within this plan's supported scope)
+## Phase 5: Guest view — shared list with statuses
 
-- `app.json` sets `"scheme": "giftlist"` and includes `expo-dev-client`; a development build is produced (D1, D4).
-- `src/lib/share-link.ts` builds `giftlist://list/<token>` from `GiftList.share_token`; owner screen exposes it (Phase 2).
-- `src/lib/share-link.tsx` captures and buffers a valid `hostname === 'list'` token across the auth redirect; the session gate exposes it post-login (D2, D3, D5, D6, D7).
-- `npx tsc --noEmit` and `npx expo lint` pass.
-- Phase 4 remains explicitly blocked until S-02 lands and O1/O4 are resolved.
+### Overview
+
+Trasa `/list/[token]` dla zalogowanego gościa: dołącza do listy przez RPC, pobiera prezenty i pokazuje je z ich statusami, tylko do odczytu.
+
+### Changes Required:
+
+#### 1. Guest route
+
+**File**: `src/app/(app)/list/[token].tsx` (nowy)
+
+**Intent**: Ekran gościa, który waliduje token, wywołuje `openSharedList`, potem `listGifts`, i renderuje stan (ładowanie / błąd / lista / pusta lista) bez akcji rezerwacji.
+
+**Contract**:
+- Parametr: `useLocalSearchParams<{ token: string }>()`.
+- Jeśli `!isShareToken(token)` → stan błędu „Nieprawidłowy link.” bez wywołania RPC.
+- Sekwencja: `openSharedList(token)` → `listGifts(list.id)`; flaga `active` w efekcie (wzorzec `index.tsx:28–64`), żeby nie ustawiać stanu po odmontowaniu.
+- Renderuje nazwę listy (`ThemedText type="subtitle"`), `GiftList` gdy są prezenty, w przeciwnym razie tekst „Ta lista nie ma jeszcze prezentów.”, błędy przez `FormError`.
+- Brak wywołań Supabase bezpośrednio w widoku — tylko funkcje z `src/lib/`.
+- Statusy pochodzą z `gifts.status` (RLS `select_gifts`); nie czytać `reservations` ani `reservation_status`.
+
+#### 2. Typed routes
+
+**File**: `.expo/types/` (generowane, gitignorowane)
+
+**Intent**: Wygenerować typy dla nowej trasy przed kompilacją.
+
+**Contract**: uruchomić `npx expo start` raz (typed routes); następnie `npx tsc --noEmit`. Nie commitować `.expo/`.
+
+### Success Criteria:
+
+#### Automated Verification:
+
+- `npx tsc --noEmit` przechodzi (po regeneracji typed routes)
+- `npx expo lint` przechodzi
+- Plik `src/app/(app)/list/[token].tsx` istnieje i nie importuje `supabase` bezpośrednio
+
+#### Manual Verification:
+
+- Gość (zalogowany innym kontem) otwiera link właściciela — widzi nazwę listy i wszystkie prezenty ze statusami „Wolny”, „Zarezerwowany”, „Zrealizowany”
+- Nieprawidłowy token (np. `giftlist://list/abc`) — wyświetla „Nieprawidłowy link.”, bez awarii
+- Nieistniejący poprawny UUID — wyświetla „Nie znaleziono listy.”
+- Widok nie pokazuje tożsamości rezerwującego w żadnym miejscu
+- Kontrole 4.4–4.6 z Fazy 4 wykonane end-to-end (link → login → lista)
+
+---
+
+## DoD (Definition of Done)
+
+- `app.json` ma `"scheme": "giftlist"` i `expo-dev-client`; development build działa lokalnie (Faza 1).
+- `buildShareUrl` tworzy `giftlist://list/<share_token>`; właściciel widzi i udostępnia link (Fazy 2–3).
+- Przychodzący link jest przechwytywany, buforowany dla niezalogowanego i kierowany do widoku gościa po zalogowaniu (Faza 4).
+- Gość widzi listę ze statusami, tylko do odczytu, bez tożsamości rezerwującego (Faza 5).
+- `npx tsc --noEmit` i `npx expo lint` przechodzą.
+- Brak nowych testów, brak Playwright, brak zmian w `supabase/`.
 
 ## Risks
 
 | # | Risk | Mitigation |
-|---|------|------------|
-| 1 | Implementing the guest view against assumed S-02 fields → rework | Gate Phase 4 on O1; do not start it before S-02 is `done`. |
-| 2 | Token lost if the app is killed while at `(auth)` and never returns to foreground | Record as Open Question O6 (persistence); buffer is in-memory per source. |
-| 3 | `giftlist://` not registered because a dev build wasn't rebuilt after `app.json` change | Phase 1 requires a fresh build (expo-linking-research.md:73–75); manual check that the app is not Expo Go. |
-| 4 | Typed-route errors after adding routes | Regenerate `.expo/types/` before `tsc` (S-01 pattern). |
-| 5 | Duplicating deep-link routing that Expo Router already performs | Only token logic in the hook; rely on Expo Router for navigation (expo-linking-research.md:50–52). |
+|---|------|-----------|
+| 1 | Zmiana scheme bez przebudowy build → link nie działa | Faza 1 wymaga nowego `expo run`; kontrola, że aplikacja nie jest Expo Go. |
+| 2 | Token zgubiony, gdy aplikacja zostanie zabita na ekranie logowania | Akceptowane (decyzja: pamięć); gość ponownie otwiera link. Ryzyko udokumentowane w Open Risks. |
+| 3 | Podwójna nawigacja (routing Expo Router + bufor) | Bufor tylko przy `session === null`; `clearPendingToken` przed `push`. |
+| 4 | Pusta lista u gościa, bo RPC nie została wykonana przed `listGifts` | Kolejność w Phase 5; `select_gifts` wymaga członkostwa. |
+| 5 | Typed-route błędy po dodaniu `list/[token].tsx` | Regeneracja `.expo/types/` przed `tsc`. |
+| 6 | Owner otwiera własny link → RPC dodaje go jako członka | Nieszkodliwe (`on conflict do nothing`); widok pokazuje tę samą listę. |
 
 ## Out of scope
 
-- Gift read model / gift UI / status rendering owned by S-02 (O1).
-- Reservations & realtime (S-04), mark purchased (S-05), protected deletes (S-06).
-- DB migrations; edits to applied migrations (`20261005113900_…`).
-- Auth changes, OAuth/magic link, password reset.
-- CI, test runner, `service_role`/server code.
+- Rezerwacja, realtime, oznaczanie zrealizowanego, usuwanie z ochroną (S-04…S-06).
+- Migracje DB, zmiany RLS, edycja zastosowanych migracji.
+- Auth (OAuth, magic link, reset hasła), `service_role`, serwer.
+- Testy E2E Playwright, testy jednostkowe, CI, `eas.json`.
 
-## Open questions
+## Open risks & assumptions
 
-1. **O1 — S-02 dependency (blocking Phase 4).** S-02 (`add-gift`) is not implemented: no `src/lib/gifts.ts`, no gift/status view (navigation-auth-research.md:39–48; roadmap.md:101–111). Does S-03 wait for S-02, or does it deliver a minimal owner-independent read view? **Owner: team. Block: Phase 4.**
-2. **O2 — Development-build mechanism.** Research recommends `npx expo run:android|ios` **or** `eas build --profile development` (expo-linking-research.md:74–75), but the repo has **no `eas.json`**. Which path is authorized (local run vs. creating EAS config)? **Owner: team. Block: Phase 1 completion.**
-3. **O3 — Share-link construction.** Build the literal `giftlist://list/<token>` string (per expo-linking-research.md:14) or use `Linking.createURL('/list/<token>')`? The research artifact does not show `createURL`, so this is not locked. **Owner: team. Block: no.**
-4. **O4 — Guest route shape.** Research locates the *hook* in the root layout but does not define the guest **screen/route** (navigation-auth-research.md:18–24, 58–59). Decide the route file/path. **Owner: team. Block: Phase 4.**
-5. **O5 — FR-007 scope here.** FR-007 is "generate a shareable link"; FR-008 is "open after login". Confirm Phase 2 (emission) is the full owner-side deliverable for this slice and that no per-viewer permission prompt is expected (prd.md:78–80). **Owner: team. Block: no.**
-6. **O6 — Pending-token persistence.** The buffer is in-memory (navigation-auth-research.md:22–24). Should the pending token persist across an app kill (e.g., AsyncStorage is already a dependency, `package.json:7`)? **Owner: team. Block: no.**
-7. **O7 — Bookkeeping.** Roadmap S-03 `Status` and whether to create a `change.md` identity file (no `/10x-new` installed here; cf. F-01 plan Open Question #2). Flip to `planning` now, or keep `proposed` until S-02 unblocks? **Owner: team. Block: no.**
+- Link `giftlist://` nie otwiera się klikalnie we wszystkich komunikatorach (wybór custom scheme, zaakceptowany).
+- Development build wymaga lokalnego Android Studio lub Xcode (wybór lokalnego buildu, zaakceptowany).
+- `package.json` zawiera `vitest` i `@playwright/test` oraz skrypt `test`; zgodnie z ograniczeniem użytkownika nie są używane w tym zakresie.
+- Statusy są migawką z chwili otwarcia ekranu; odświeżanie na żywo przychodzi w S-04.
 
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles.
 
-### Phase 1 — Native config: scheme + development build
+### Phase 1: Native config — scheme and development build
 
 #### Automated
-- [ ] 1.1 `npx tsc --noEmit` passes
-- [ ] 1.2 `npx expo lint` passes
-- [ ] 1.3 `app.json` has `"scheme": "giftlist"` and `expo-dev-client` in `plugins`
+- [x] 1.1 `npx tsc --noEmit` passes
+- [x] 1.2 `npx expo lint` passes
+- [x] 1.3 `app.json` has `"scheme": "giftlist"` and `expo-dev-client` in `plugins`
 
 #### Manual
-- [ ] 1.4 Development build installs; `giftlist://` opens the app (not Expo Go)
+- [x] 1.4 Development build installs; `giftlist://` opens the app (not Expo Go)
 
-### Phase 2 — Share-link emission
+### Phase 2: Data layer — share URL and shared-list access
 
 #### Automated
 - [ ] 2.1 `npx tsc --noEmit` passes
 - [ ] 2.2 `npx expo lint` passes
-- [ ] 2.3 `src/lib/share-link.ts` exists
+- [ ] 2.3 `src/lib/share-link.ts` exports `buildShareUrl`, `isShareToken`, `parseShareToken`
+- [ ] 2.4 `src/lib/lists.ts` exports `openSharedList`
 
-#### Manual
-- [ ] 2.4 Owner sees `giftlist://list/<uuid>` matching `share_token`
-
-### Phase 3 — Deep-link capture and token-through-auth
+### Phase 3: Owner share link on the list screen
 
 #### Automated
 - [ ] 3.1 `npx tsc --noEmit` passes
 - [ ] 3.2 `npx expo lint` passes
-- [ ] 3.3 `src/lib/share-link.tsx` exists; root layout mounts the provider
+- [ ] 3.3 `src/components/share-link-card.tsx` exists and is mounted in `src/app/(app)/index.tsx`
 
 #### Manual
-- [ ] 3.4 Logged-in user opens link → token captured, no crash
-- [ ] 3.5 Logged-out user opens link → auth redirect; token survives until after login
+- [ ] 3.4 Owner sees `giftlist://list/<uuid>` matching `share_token`
+- [ ] 3.5 “Udostępnij” opens the native share sheet with the link
 
-### Phase 4 — Guest view (BLOCKED)
-- [ ] 4.x Blocked by O1 (S-02) and O4 (route shape)
+### Phase 4: Deep-link capture and pending token across login
+
+#### Automated
+- [ ] 4.1 `npx tsc --noEmit` passes
+- [ ] 4.2 `npx expo lint` passes
+- [ ] 4.3 `src/lib/share-link.tsx` exists; root layout mounts `ShareLinkProvider` inside `SessionProvider`
+
+#### Manual
+- [ ] 4.4 Logged-in user opens link with app running — no crash, routed to guest view (complete with Phase 5)
+- [ ] 4.5 Logged-in user opens link on cold start — no crash, routed to guest view (complete with Phase 5)
+- [ ] 4.6 Logged-out user opens link → login; after login routed to `/list/<token>` (complete with Phase 5)
+
+### Phase 5: Guest view — shared list with statuses
+
+#### Automated
+- [ ] 5.1 `npx tsc --noEmit` passes (after typed routes regenerated)
+- [ ] 5.2 `npx expo lint` passes
+- [ ] 5.3 `src/app/(app)/list/[token].tsx` exists and does not import `supabase` directly
+
+#### Manual
+- [ ] 5.4 Guest sees list name and all gifts with “Wolny” / “Zarezerwowany” / “Zrealizowany” statuses
+- [ ] 5.5 Invalid token shows “Nieprawidłowy link.” without crash
+- [ ] 5.6 Non-existent valid UUID shows “Nie znaleziono listy.”
+- [ ] 5.7 No reserver identity shown anywhere in the guest view
 
 ## References
 
 - Research: `context/changes/share-link-and-guest-access/expo-linking-research.md`, `…/navigation-auth-research.md`
-- Roadmap: `context/foundation/roadmap.md` (S-03 lines 47, 113–123; S-02 lines 46, 101–111; prerequisite line 118)
-- PRD: `context/foundation/prd.md` (FR-007 line 78, FR-008 line 80, FR-010 line 86, US-01 line 46)
-- Schema/RPC: `supabase/migrations/20261005113900_initial_schema.sql:8, 89–102`; `supabase/migrations/20261005153300_reservation_status_scope.sql`
-- Client: `src/lib/supabase.ts:17`; `src/lib/session.tsx`; `src/lib/lists.ts:6`
-- Layout: `src/app/_layout.tsx:18–25, 29–37`
+- Roadmap: `context/foundation/roadmap.md` (S-03 lines 113–123; S-02 done lines 101–111)
+- PRD: `context/foundation/prd.md` (FR-007, FR-008, FR-010)
+- Schema/RPC: `supabase/migrations/20261005113900_initial_schema.sql:8, 64–68, 96–102, 135–138`; `supabase/migrations/20261005153300_reservation_status_scope.sql`
+- Client: `src/lib/supabase.ts`, `src/lib/session.tsx`, `src/lib/lists.ts:6`, `src/lib/gifts.ts:91–102`
+- Layout: `src/app/_layout.tsx:18–25, 29–38`; owner screen `src/app/(app)/index.tsx:91–105`

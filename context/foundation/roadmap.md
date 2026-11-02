@@ -3,7 +3,7 @@ project: "GiftList"
 version: 1
 status: draft
 created: 2026-10-05
-updated: 2026-10-23
+updated: 2026-11-02
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -44,7 +44,7 @@ Istniejące narzędzia do list życzeń (Amazon Wishlist, Listronic) są zamkni�
 | F-01  | reservation-privacy-tests    | (foundation) harness pgTAP dowodzący, że tożsamość rezerwującego nigdy nie wycieka | —             | FR-010, Guardrails    | done     |
 | S-01  | auth-and-first-list          | użytkownik zarejestrować się/zalogować i mieć własną listę    | —             | FR-001, FR-002, FR-003 | done     |
 | S-02  | add-gift                     | Życzący dodać prezent (nazwa, link, cena, opcjonalnie zdjęcie) | S-01          | FR-005                | done     |
-| S-03  | share-link-and-guest-access  | udostępnić listę linkiem; gość otworzyć link i zobaczyć listę ze statusami | S-02          | FR-007, FR-008, FR-010 | proposed |
+| S-03  | share-link-and-guest-access  | udostępnić listę linkiem; gość otworzyć link i zobaczyć listę ze statusami | S-02          | FR-007, FR-008, FR-010 | in-progress |
 | S-04  | reserve-gift-hidden-identity | Obdarowujący zarezerwować wolny prezent; status widoczny natychmiast, tożsamość ukryta | S-03, F-01    | US-01, FR-009, FR-010 | proposed |
 | S-05  | mark-gift-purchased          | rezerwujący oznaczyć zarezerwowany prezent jako zrealizowany | S-04          | FR-011                | proposed |
 | S-06  | protected-deletes            | usunąć listę/prezent tylko, gdy żadna rezerwacja go nie chroni | S-04          | FR-004, FR-006        | proposed |
@@ -120,7 +120,7 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 - **Blockers:** —
 - **Unknowns:** „Czy deep link `giftlist://list/<token>` działa w Expo Go, czy wymaga dev build (zmiana scheme w `app.json` i `expo-linking`)?" — Owner: team. Block: no.
 - **Risk:** Zmiana scheme (`bootstrapscaffold` → `giftlist`) dotyka konfiguracji natywnej; to pierwszy użytek widoku statusów (FR-010) i wzorca membership (`open_shared_list`).
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-04: Rezerwacja prezentu (gwiazda przewodnia)
 

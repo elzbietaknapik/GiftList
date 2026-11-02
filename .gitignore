@@ -42,3 +42,14 @@ example
 # generated native folders
 /ios
 /android
+
+# stryker temp files
+.stryker-tmp
+
+# Playwright
+playwright/.auth/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+.playwright-cli/

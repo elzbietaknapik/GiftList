@@ -1,7 +1,7 @@
 ---
 change_id: testing-reservation-lifecycle
 title: Reservation lifecycle integrity tests
-status: implemented
+status: impl_reviewed
 created: 2026-10-23
 updated: 2026-10-30
 archived_at: null
