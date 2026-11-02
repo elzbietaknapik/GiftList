@@ -21,6 +21,15 @@ export default function SharedListScreen() {
   const [list, setList] = useState<GiftListModel | null>(null);
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [error, setError] = useState<string | null>(valid ? null : 'Nieprawidłowy link.');
+  const [activeToken, setActiveToken] = useState(token);
+
+  if (activeToken !== token) {
+    setActiveToken(token);
+    setList(null);
+    setGifts([]);
+    setLoading(valid);
+    setError(valid ? null : 'Nieprawidłowy link.');
+  }
 
   useEffect(() => {
     if (!valid) return;

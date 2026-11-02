@@ -201,13 +201,13 @@ Przechwycić przychodzący `giftlist://list/<token>` w root layout, zbuforować 
 
 #### 1. Share-link provider
 
-**File**: `src/lib/share-link.tsx` (nowy)
+**File**: `src/lib/share-link-provider.tsx` (nowy)
 
 **Intent**: Jeden właściciel stanu „oczekującego tokenu”, który przetrwa przekierowanie do `(auth)`.
 
 **Contract**:
 - `ShareLinkProvider({ children })` używa `useSession()` (`src/lib/session.tsx`) oraz `Linking.useLinkingURL()` (obsługuje link początkowy i link przychodzący gdy aplikacja działa; nie używać przestarzałego `useURL`).
-- Efekt: gdy `loading === false`, `session === null`, a URL nie jest `null` — `parseShareToken(url)`; jeśli zwraca token, zapisz w stanie `pendingToken`.
+- Efekt: gdy `loading === false`, `session === null`, a URL nie jest `null` — `parseShareToken(url)`; jeśli zwraca token, zapisz w stanie `pendingToken`. (Implementacja: pochodna `pendingToken` liczona podczas renderu przez porównanie poprzedniego klucza `loading|session|url` — udokumentowany wzorzec Reacta „adjust state during render”, równoważny efektowi.)
 - Eksportuje hook `useShareLink()` zwracający `{ pendingToken: string | null, clearPendingToken: () => void }`; hook rzuca błąd poza providerem (wzorzec `useSession`).
 - Nie wykonuje żadnej nawigacji ani wywołania RPC.
 Source: `expo-linking-research.md:12, 16–33`; `navigation-auth-research.md:18–24, 28–35`.
@@ -234,7 +234,7 @@ Source: `expo-linking-research.md:12, 16–33`; `navigation-auth-research.md:18�
 
 - `npx tsc --noEmit` przechodzi
 - `npx expo lint` przechodzi
-- Plik `src/lib/share-link.tsx` istnieje; `src/app/_layout.tsx` zawiera `ShareLinkProvider` wewnątrz `SessionProvider`
+- Plik `src/lib/share-link-provider.tsx` istnieje; `src/app/_layout.tsx` zawiera `ShareLinkProvider` wewnątrz `SessionProvider`
 
 #### Manual Verification:
 
@@ -366,7 +366,7 @@ Trasa `/list/[token]` dla zalogowanego gościa: dołącza do listy przez RPC, po
 #### Automated
 - [x] 4.1 `npx tsc --noEmit` passes — bef2539
 - [x] 4.2 `npx expo lint` passes — bef2539
-- [x] 4.3 `src/lib/share-link.tsx` exists; root layout mounts `ShareLinkProvider` inside `SessionProvider` — bef2539
+- [x] 4.3 `src/lib/share-link-provider.tsx` exists; root layout mounts `ShareLinkProvider` inside `SessionProvider` — bef2539
 
 #### Manual
 - [x] 4.4 Logged-in user opens link with app running — no crash, routed to guest view (complete with Phase 5) — fff7a4c
