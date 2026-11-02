@@ -165,7 +165,7 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 | F-01       | reservation-privacy-tests    | RLS: pakiet pgTAP dowodzący ukrycia tożsamości rezerwującego | yes                   | Run `/10x-plan reservation-privacy-tests` — odblokowuje S-04 |
 | S-01       | auth-and-first-list          | Rejestracja/logowanie + pierwsza lista użytkownika        | yes                   | Run `/10x-plan auth-and-first-list` |
 | S-02       | add-gift                     | Dodawanie prezentów do listy                             | no                    | done — zrealizowane (FR-005) |
-| S-03       | share-link-and-guest-access  | Link udostępniania i widok listy dla gościa               | yes                   | S-02 done — gotowe do `/10x-plan` |
+| S-03       | share-link-and-guest-access  | Link udostępniania i widok listy dla gościa               | no                    | done — zrealizowane (FR-007, FR-008, FR-010) |
 | S-04       | reserve-gift-hidden-identity | Rezerwacja prezentu z ukrytą tożsamością                 | no                    | gwiazda przewodnia; czeka na S-03, F-01 |
 | S-05       | mark-gift-purchased          | Oznaczanie rezerwacji jako zrealizowanej                 | no                    | czeka na S-04 |
 | S-06       | protected-deletes            | Usuwanie listy/prezentu z ochroną rezerwacji             | no                    | czeka na S-04 |
