@@ -193,3 +193,4 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 ## Done
 
 - **S-01: Konto i pierwsza lista** — Użytkownik (Życzący) może się zarejestrować lub zalogować (email + hasło) i trafić na swoją listę prezentową (pustą, z nazwą). — Archived 2026-10-16 → `context/archive/2026-10-16-auth-and-first-list/`. Lesson: —.
+- **S-03: Link udostępniania i widok gościa** — Życzący może wygenerować link udostępniania; Obdarowujący po otwarciu linka i zalogowaniu widzi listę ze statusami (wolny/zarezerwowany/zrealizowany). — Archived 2026-11-02 → `context/archive/2026-11-02-share-link-and-guest-access/`. Lesson: —.
