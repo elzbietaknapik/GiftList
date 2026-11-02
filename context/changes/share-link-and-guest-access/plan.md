@@ -345,21 +345,21 @@ Trasa `/list/[token]` dla zalogowanego gościa: dołącza do listy przez RPC, po
 ### Phase 2: Data layer — share URL and shared-list access
 
 #### Automated
-- [x] 2.1 `npx tsc --noEmit` passes
-- [x] 2.2 `npx expo lint` passes
-- [x] 2.3 `src/lib/share-link.ts` exports `buildShareUrl`, `isShareToken`, `parseShareToken`
-- [x] 2.4 `src/lib/lists.ts` exports `openSharedList`
+- [x] 2.1 `npx tsc --noEmit` passes — 5b35fe9
+- [x] 2.2 `npx expo lint` passes — 5b35fe9
+- [x] 2.3 `src/lib/share-link.ts` exports `buildShareUrl`, `isShareToken`, `parseShareToken` — 5b35fe9
+- [x] 2.4 `src/lib/lists.ts` exports `openSharedList` — 5b35fe9
 
 ### Phase 3: Owner share link on the list screen
 
 #### Automated
-- [ ] 3.1 `npx tsc --noEmit` passes
-- [ ] 3.2 `npx expo lint` passes
-- [ ] 3.3 `src/components/share-link-card.tsx` exists and is mounted in `src/app/(app)/index.tsx`
+- [x] 3.1 `npx tsc --noEmit` passes
+- [x] 3.2 `npx expo lint` passes
+- [x] 3.3 `src/components/share-link-card.tsx` exists and is mounted in `src/app/(app)/index.tsx`
 
 #### Manual
-- [ ] 3.4 Owner sees `giftlist://list/<uuid>` matching `share_token`
-- [ ] 3.5 “Udostępnij” opens the native share sheet with the link
+- [x] 3.4 Owner sees `giftlist://list/<uuid>` matching `share_token`
+- [x] 3.5 “Udostępnij” opens the native share sheet with the link
 
 ### Phase 4: Deep-link capture and pending token across login
 

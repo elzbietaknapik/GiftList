@@ -5,6 +5,7 @@ import { AddGiftForm } from '@/components/add-gift-form';
 import { CreateListForm } from '@/components/create-list-form';
 import { GiftList } from '@/components/gift-list';
 import { ListEmptyState } from '@/components/list-empty-state';
+import { ShareLinkCard } from '@/components/share-link-card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { FormError } from '@/components/ui/form-error';
@@ -94,6 +95,7 @@ export default function AppIndexScreen() {
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
+          <ShareLinkCard shareToken={list.share_token} />
           <AddGiftForm listId={list.id} onAdded={(gift) => setGifts((prev) => [...prev, gift])} />
           {giftsLoading ? (
             <ActivityIndicator color={theme.primary} />
