@@ -7,6 +7,8 @@ export type GiftList = {
   created_at: string;
 };
 
+export type SharedGiftList = GiftList & { owner_id: string };
+
 export class ListAlreadyExistsError extends Error {
   constructor() {
     super('Lista już istnieje.');
@@ -48,7 +50,7 @@ export async function createList(userId: string, name: string): Promise<GiftList
   return data;
 }
 
-export async function openSharedList(token: string): Promise<GiftList> {
+export async function openSharedList(token: string): Promise<SharedGiftList> {
   const { data, error } = await supabase.rpc('open_shared_list', { p_token: token });
 
   if (error) {
@@ -57,6 +59,6 @@ export async function openSharedList(token: string): Promise<GiftList> {
   if (!data) {
     throw new Error('Nie znaleziono listy.');
   }
-  const { id, name, share_token, created_at } = data as GiftList;
-  return { id, name, share_token, created_at };
+  const { id, name, share_token, created_at, owner_id } = data as SharedGiftList;
+  return { id, name, share_token, created_at, owner_id };
 }

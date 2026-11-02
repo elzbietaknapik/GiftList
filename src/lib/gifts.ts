@@ -22,6 +22,13 @@ export type NewGift = {
 
 export type GiftFieldErrors = Partial<Record<'name' | 'link' | 'price' | 'image', string>>;
 
+export class GiftAlreadyReservedError extends Error {
+  constructor() {
+    super('Prezent jest już zarezerwowany.');
+    this.name = 'GiftAlreadyReservedError';
+  }
+}
+
 const GIFT_COLUMNS = 'id,list_id,name,link,price,image_url,status,created_at';
 const PRICE_PATTERN = /^\d+(\.\d{1,2})?$/;
 const MAX_PRICE = 99999999.99;
@@ -112,4 +119,18 @@ export async function addGift(listId: string, gift: NewGift): Promise<Gift> {
     throw new Error(error.message);
   }
   return toGift(data as GiftRow);
+}
+
+export async function reserveGift(giftId: string): Promise<void> {
+  const { error } = await supabase.rpc('reserve_gift', { p_gift_id: giftId });
+
+  if (error) {
+    if (error.message.includes('gift is not free')) {
+      throw new GiftAlreadyReservedError();
+    }
+    if (error.message.includes('no access to this list')) {
+      throw new Error('Nie masz dostępu do tej listy.');
+    }
+    throw new Error(error.message);
+  }
 }
