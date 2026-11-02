@@ -258,27 +258,27 @@ Zweryfikować przepływ dwoma kontami, wyścig oraz brak wycieku tożsamości, a
 ### Phase 3: Guest view — reserve flow
 
 #### Automated
-- [x] 3.1 `npx tsc --noEmit` passes
-- [x] 3.2 `npx expo lint` passes
-- [x] 3.3 `src/app/(app)/list/[token].tsx` does not import `supabase` directly
+- [x] 3.1 `npx tsc --noEmit` passes — 13282ce
+- [x] 3.2 `npx expo lint` passes — 13282ce
+- [x] 3.3 `src/app/(app)/list/[token].tsx` does not import `supabase` directly — 13282ce
 
 #### Manual
-- [x] 3.4 Guest (non-owner) sees “Zarezerwuj” on a free gift; after tap status becomes “Zarezerwowany” without app restart
-- [x] 3.5 Race: “Ten prezent został już zarezerwowany.” appears and the list shows the current status
+- [x] 3.4 Guest (non-owner) sees “Zarezerwuj” on a free gift; after tap status becomes “Zarezerwowany” without app restart — 13282ce
+- [x] 3.5 Race: “Ten prezent został już zarezerwowany.” appears and the list shows the current status — 13282ce
 
 ### Phase 4: End-to-end verification
 
 #### Automated
-- [ ] 4.1 `npx tsc --noEmit` passes on the final tree
-- [ ] 4.2 `npx expo lint` passes on the final tree
+- [x] 4.1 `npx tsc --noEmit` passes on the final tree
+- [x] 4.2 `npx expo lint` passes on the final tree
 - [ ] 4.3 `supabase test db` passes without changes to `supabase/tests/` (requires `supabase start`)
 
 #### Manual
-- [ ] 4.4 Owner opening own link sees no “Zarezerwuj” button
-- [ ] 4.5 Two guest accounts on one free gift: second attempt shows the conflict message and refreshed status
-- [ ] 4.6 Rapid double tap on “Zarezerwuj” sends one RPC call
-- [ ] 4.7 No view (owner, guest, messages) shows the reserver identity
-- [ ] 4.8 Account without membership gets “Nie masz dostępu do tej listy.”
+- [x] 4.4 Owner opening own link sees no “Zarezerwuj” button
+- [x] 4.5 Two guest accounts on one free gift: second attempt shows the conflict message and refreshed status
+- [x] 4.6 Rapid double tap on “Zarezerwuj” sends one RPC call
+- [x] 4.7 No view (owner, guest, messages) shows the reserver identity
+- [x] 4.8 Account without membership gets “Nie masz dostępu do tej listy.”
 
 ## References
 
