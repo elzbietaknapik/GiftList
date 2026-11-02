@@ -45,7 +45,7 @@ Istniejące narzędzia do list życzeń (Amazon Wishlist, Listronic) są zamkni�
 | S-01  | auth-and-first-list          | użytkownik zarejestrować się/zalogować i mieć własną listę    | —             | FR-001, FR-002, FR-003 | done     |
 | S-02  | add-gift                     | Życzący dodać prezent (nazwa, link, cena, opcjonalnie zdjęcie) | S-01          | FR-005                | done     |
 | S-03  | share-link-and-guest-access  | udostępnić listę linkiem; gość otworzyć link i zobaczyć listę ze statusami | S-02          | FR-007, FR-008, FR-010 | done     |
-| S-04  | reserve-gift-hidden-identity | Obdarowujący zarezerwować wolny prezent; status widoczny natychmiast, tożsamość ukryta | S-03, F-01    | US-01, FR-009, FR-010 | proposed |
+| S-04  | reserve-gift-hidden-identity | Obdarowujący zarezerwować wolny prezent; status widoczny natychmiast, tożsamość ukryta | S-03, F-01    | US-01, FR-009, FR-010 | done     |
 | S-05  | mark-gift-purchased          | rezerwujący oznaczyć zarezerwowany prezent jako zrealizowany | S-04          | FR-011                | proposed |
 | S-06  | protected-deletes            | usunąć listę/prezent tylko, gdy żadna rezerwacja go nie chroni | S-04          | FR-004, FR-006        | proposed |
 
@@ -132,7 +132,7 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 - **Blockers:** —
 - **Unknowns:** „Czy Realtime gwarantuje natychmiastową widoczność statusu, czy klient potrzebuje optymistycznego update po `reserve_gift` + refetch fallback (np. `useFocus`)?" — Owner: team. Block: no.
 - **Risk:** Wyścig dwóch rezerwujących — RPC `reserve_gift` jest atomowy (`update … where status = 'free'` + guard), ale UI musi pokazywać status niezależnie od lagu Realtime (Risk #3/#9 z infra.md).
-- **Status:** proposed
+- **Status:** done
 
 ### S-05: Oznaczanie jako zrealizowany
 
@@ -194,3 +194,4 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 
 - **S-01: Konto i pierwsza lista** — Użytkownik (Życzący) może się zarejestrować lub zalogować (email + hasło) i trafić na swoją listę prezentową (pustą, z nazwą). — Archived 2026-10-16 → `context/archive/2026-10-16-auth-and-first-list/`. Lesson: —.
 - **S-03: Link udostępniania i widok gościa** — Życzący może wygenerować link udostępniania; Obdarowujący po otwarciu linka i zalogowaniu widzi listę ze statusami (wolny/zarezerwowany/zrealizowany). — Archived 2026-11-02 → `context/archive/2026-11-02-share-link-and-guest-access/`. Lesson: —.
+- **S-04: Obdarowujący może zarezerwować wolny prezent; status staje się natychmiast widoczny dla wszystkich, a tożsamość rezerwującego nie jest widoczna dla nikogo.** — Archived 2026-11-02 → `context/archive/2026-11-02-reserve-gift-hidden-identity/`. Lesson: —.
