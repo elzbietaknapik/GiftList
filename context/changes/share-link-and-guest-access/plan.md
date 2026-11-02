@@ -369,22 +369,22 @@ Trasa `/list/[token]` dla zalogowanego gościa: dołącza do listy przez RPC, po
 - [x] 4.3 `src/lib/share-link.tsx` exists; root layout mounts `ShareLinkProvider` inside `SessionProvider` — bef2539
 
 #### Manual
-- [x] 4.4 Logged-in user opens link with app running — no crash, routed to guest view (complete with Phase 5)
-- [x] 4.5 Logged-in user opens link on cold start — no crash, routed to guest view (complete with Phase 5)
-- [x] 4.6 Logged-out user opens link → login; after login routed to `/list/<token>` (complete with Phase 5)
+- [x] 4.4 Logged-in user opens link with app running — no crash, routed to guest view (complete with Phase 5) — fff7a4c
+- [x] 4.5 Logged-in user opens link on cold start — no crash, routed to guest view (complete with Phase 5) — fff7a4c
+- [x] 4.6 Logged-out user opens link → login; after login routed to `/list/<token>` (complete with Phase 5) — fff7a4c
 
 ### Phase 5: Guest view — shared list with statuses
 
 #### Automated
-- [x] 5.1 `npx tsc --noEmit` passes (after typed routes regenerated)
-- [x] 5.2 `npx expo lint` passes
-- [x] 5.3 `src/app/(app)/list/[token].tsx` exists and does not import `supabase` directly
+- [x] 5.1 `npx tsc --noEmit` passes (after typed routes regenerated) — fff7a4c
+- [x] 5.2 `npx expo lint` passes — fff7a4c
+- [x] 5.3 `src/app/(app)/list/[token].tsx` exists and does not import `supabase` directly — fff7a4c
 
 #### Manual
-- [x] 5.4 Guest sees list name and all gifts with “Wolny” / “Zarezerwowany” / “Zrealizowany” statuses
-- [x] 5.5 Invalid token shows “Nieprawidłowy link.” without crash
-- [x] 5.6 Non-existent valid UUID shows “Nie znaleziono listy.”
-- [x] 5.7 No reserver identity shown anywhere in the guest view
+- [x] 5.4 Guest sees list name and all gifts with “Wolny” / “Zarezerwowany” / “Zrealizowany” statuses — fff7a4c
+- [x] 5.5 Invalid token shows “Nieprawidłowy link.” without crash — fff7a4c
+- [x] 5.6 Non-existent valid UUID shows “Nie znaleziono listy.” — fff7a4c
+- [x] 5.7 No reserver identity shown anywhere in the guest view — fff7a4c
 
 ## References
 

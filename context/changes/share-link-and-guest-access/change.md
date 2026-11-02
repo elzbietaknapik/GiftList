@@ -1,7 +1,7 @@
 ---
 change_id: share-link-and-guest-access
 title: Share link and guest access
-status: implementing
+status: implemented
 created: 2026-11-02
 updated: 2026-11-02
 archived_at: null
