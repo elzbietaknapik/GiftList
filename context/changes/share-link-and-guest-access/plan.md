@@ -335,20 +335,20 @@ Trasa `/list/[token]` dla zalogowanego gościa: dołącza do listy przez RPC, po
 ### Phase 1: Native config — scheme and development build
 
 #### Automated
-- [x] 1.1 `npx tsc --noEmit` passes
-- [x] 1.2 `npx expo lint` passes
-- [x] 1.3 `app.json` has `"scheme": "giftlist"` and `expo-dev-client` in `plugins`
+- [x] 1.1 `npx tsc --noEmit` passes — d18c843
+- [x] 1.2 `npx expo lint` passes — d18c843
+- [x] 1.3 `app.json` has `"scheme": "giftlist"` and `expo-dev-client` in `plugins` — d18c843
 
 #### Manual
-- [x] 1.4 Development build installs; `giftlist://` opens the app (not Expo Go)
+- [x] 1.4 Development build installs; `giftlist://` opens the app (not Expo Go) — d18c843
 
 ### Phase 2: Data layer — share URL and shared-list access
 
 #### Automated
-- [ ] 2.1 `npx tsc --noEmit` passes
-- [ ] 2.2 `npx expo lint` passes
-- [ ] 2.3 `src/lib/share-link.ts` exports `buildShareUrl`, `isShareToken`, `parseShareToken`
-- [ ] 2.4 `src/lib/lists.ts` exports `openSharedList`
+- [x] 2.1 `npx tsc --noEmit` passes
+- [x] 2.2 `npx expo lint` passes
+- [x] 2.3 `src/lib/share-link.ts` exports `buildShareUrl`, `isShareToken`, `parseShareToken`
+- [x] 2.4 `src/lib/lists.ts` exports `openSharedList`
 
 ### Phase 3: Owner share link on the list screen
 

@@ -47,3 +47,16 @@ export async function createList(userId: string, name: string): Promise<GiftList
   }
   return data;
 }
+
+export async function openSharedList(token: string): Promise<GiftList> {
+  const { data, error } = await supabase.rpc('open_shared_list', { p_token: token });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  if (!data) {
+    throw new Error('Nie znaleziono listy.');
+  }
+  const { id, name, share_token, created_at } = data as GiftList;
+  return { id, name, share_token, created_at };
+}
