@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { Button } from '@/components/ui/button';
 import { Radius, Spacing } from '@/constants/theme';
 import type { Gift, GiftStatus } from '@/lib/gifts';
 
@@ -17,9 +18,11 @@ function formatPrice(price: number): string {
 
 type GiftListProps = {
   gifts: Gift[];
+  onReserve?: (gift: Gift) => void;
+  reservingId?: string | null;
 };
 
-export function GiftList({ gifts }: GiftListProps) {
+export function GiftList({ gifts, onReserve, reservingId }: GiftListProps) {
   return (
     <View style={styles.list}>
       {gifts.map((gift) => (
@@ -31,6 +34,15 @@ export function GiftList({ gifts }: GiftListProps) {
             <ThemedText themeColor="textSecondary">{formatPrice(gift.price)}</ThemedText>
           </View>
           <ThemedText themeColor="textSecondary">{STATUS_LABELS[gift.status]}</ThemedText>
+          {gift.status === 'free' && onReserve ? (
+            <Button
+              label="Zarezerwuj"
+              accessibilityLabel={`Zarezerwuj ${gift.name}`}
+              loading={reservingId === gift.id}
+              disabled={reservingId !== null}
+              onPress={() => onReserve(gift)}
+            />
+          ) : null}
           <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
             {gift.link}
           </ThemedText>

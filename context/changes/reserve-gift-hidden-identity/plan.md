@@ -240,20 +240,20 @@ Zweryfikować przepływ dwoma kontami, wyścig oraz brak wycieku tożsamości, a
 ### Phase 1: Data layer — reserve RPC wrapper and owner id
 
 #### Automated
-- [x] 1.1 `npx tsc --noEmit` passes
-- [x] 1.2 `npx expo lint` passes
-- [x] 1.3 `src/lib/gifts.ts` exports `reserveGift` and `GiftAlreadyReservedError`
-- [x] 1.4 `src/lib/lists.ts` exports `SharedGiftList` and `openSharedList` returns `owner_id`
+- [x] 1.1 `npx tsc --noEmit` passes — 86fb86b
+- [x] 1.2 `npx expo lint` passes — 86fb86b
+- [x] 1.3 `src/lib/gifts.ts` exports `reserveGift` and `GiftAlreadyReservedError` — 86fb86b
+- [x] 1.4 `src/lib/lists.ts` exports `SharedGiftList` and `openSharedList` returns `owner_id` — 86fb86b
 
 ### Phase 2: Gift list action slot
 
 #### Automated
-- [ ] 2.1 `npx tsc --noEmit` passes
-- [ ] 2.2 `npx expo lint` passes
-- [ ] 2.3 `src/components/gift-list.tsx` imports `Button` and accepts `onReserve`, `reservingId`
+- [x] 2.1 `npx tsc --noEmit` passes
+- [x] 2.2 `npx expo lint` passes
+- [x] 2.3 `src/components/gift-list.tsx` imports `Button` and accepts `onReserve`, `reservingId`
 
 #### Manual
-- [ ] 2.4 Owner screen (`src/app/(app)/index.tsx`) shows no “Zarezerwuj” button
+- [x] 2.4 Owner screen (`src/app/(app)/index.tsx`) shows no “Zarezerwuj” button
 
 ### Phase 3: Guest view — reserve flow
 
