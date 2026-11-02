@@ -8,19 +8,23 @@ import { ThemedView } from '@/components/themed-view';
 import { FormError } from '@/components/ui/form-error';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { listGifts, type Gift } from '@/lib/gifts';
-import { openSharedList, type GiftList as GiftListModel } from '@/lib/lists';
+import { GiftAlreadyReservedError, listGifts, reserveGift, type Gift } from '@/lib/gifts';
+import { openSharedList, type SharedGiftList } from '@/lib/lists';
+import { useSession } from '@/lib/session';
 import { isShareToken } from '@/lib/share-link';
 
 export default function SharedListScreen() {
   const theme = useTheme();
+  const { user } = useSession();
   const params = useLocalSearchParams<{ token: string }>();
   const token = params.token ?? '';
   const valid = isShareToken(token);
   const [loading, setLoading] = useState(valid);
-  const [list, setList] = useState<GiftListModel | null>(null);
+  const [list, setList] = useState<SharedGiftList | null>(null);
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [error, setError] = useState<string | null>(valid ? null : 'Nieprawidłowy link.');
+  const [reservingId, setReservingId] = useState<string | null>(null);
+  const [reserveError, setReserveError] = useState<string | null>(null);
   const [activeToken, setActiveToken] = useState(token);
 
   if (activeToken !== token) {
@@ -29,6 +33,8 @@ export default function SharedListScreen() {
     setGifts([]);
     setLoading(valid);
     setError(valid ? null : 'Nieprawidłowy link.');
+    setReservingId(null);
+    setReserveError(null);
   }
 
   useEffect(() => {
@@ -52,6 +58,36 @@ export default function SharedListScreen() {
     };
   }, [token, valid]);
 
+  const canReserve = list !== null && list.owner_id !== user?.id;
+
+  async function handleReserve(gift: Gift) {
+    if (!list) return;
+    setReservingId(gift.id);
+    setReserveError(null);
+    try {
+      await reserveGift(gift.id);
+      setGifts(await listGifts(list.id));
+    } catch (e) {
+      const alreadyReserved = e instanceof GiftAlreadyReservedError;
+      setReserveError(
+        alreadyReserved
+          ? 'Ten prezent został już zarezerwowany.'
+          : e instanceof Error
+            ? e.message
+            : 'Nie udało się zarezerwować prezentu.',
+      );
+      if (alreadyReserved) {
+        try {
+          setGifts(await listGifts(list.id));
+        } catch {
+          return;
+        }
+      }
+    } finally {
+      setReservingId(null);
+    }
+  }
+
   if (loading) {
     return (
       <ThemedView style={styles.centered}>
@@ -72,12 +108,18 @@ export default function SharedListScreen() {
 
       {error ? <FormError>{error}</FormError> : null}
 
+      {reserveError ? <FormError>{reserveError}</FormError> : null}
+
       {list ? (
         <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
           {gifts.length === 0 ? (
             <ThemedText>Ta lista nie ma jeszcze prezentów.</ThemedText>
           ) : (
-            <GiftList gifts={gifts} />
+            <GiftList
+              gifts={gifts}
+              onReserve={canReserve ? handleReserve : undefined}
+              reservingId={reservingId}
+            />
           )}
         </ScrollView>
       ) : null}

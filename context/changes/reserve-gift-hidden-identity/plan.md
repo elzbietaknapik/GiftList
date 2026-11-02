@@ -248,23 +248,23 @@ Zweryfikować przepływ dwoma kontami, wyścig oraz brak wycieku tożsamości, a
 ### Phase 2: Gift list action slot
 
 #### Automated
-- [x] 2.1 `npx tsc --noEmit` passes
-- [x] 2.2 `npx expo lint` passes
-- [x] 2.3 `src/components/gift-list.tsx` imports `Button` and accepts `onReserve`, `reservingId`
+- [x] 2.1 `npx tsc --noEmit` passes — 41e9ea1
+- [x] 2.2 `npx expo lint` passes — 41e9ea1
+- [x] 2.3 `src/components/gift-list.tsx` imports `Button` and accepts `onReserve`, `reservingId` — 41e9ea1
 
 #### Manual
-- [x] 2.4 Owner screen (`src/app/(app)/index.tsx`) shows no “Zarezerwuj” button
+- [x] 2.4 Owner screen (`src/app/(app)/index.tsx`) shows no “Zarezerwuj” button — 41e9ea1
 
 ### Phase 3: Guest view — reserve flow
 
 #### Automated
-- [ ] 3.1 `npx tsc --noEmit` passes
-- [ ] 3.2 `npx expo lint` passes
-- [ ] 3.3 `src/app/(app)/list/[token].tsx` does not import `supabase` directly
+- [x] 3.1 `npx tsc --noEmit` passes
+- [x] 3.2 `npx expo lint` passes
+- [x] 3.3 `src/app/(app)/list/[token].tsx` does not import `supabase` directly
 
 #### Manual
-- [ ] 3.4 Guest (non-owner) sees “Zarezerwuj” on a free gift; after tap status becomes “Zarezerwowany” without app restart
-- [ ] 3.5 Race: “Ten prezent został już zarezerwowany.” appears and the list shows the current status
+- [x] 3.4 Guest (non-owner) sees “Zarezerwuj” on a free gift; after tap status becomes “Zarezerwowany” without app restart
+- [x] 3.5 Race: “Ten prezent został już zarezerwowany.” appears and the list shows the current status
 
 ### Phase 4: End-to-end verification
 
