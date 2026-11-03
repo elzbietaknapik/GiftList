@@ -29,6 +29,13 @@ export class GiftAlreadyReservedError extends Error {
   }
 }
 
+export class NotGiftReserverError extends Error {
+  constructor() {
+    super('Tylko osoba, która zarezerwowała prezent, może oznaczyć go jako kupiony.');
+    this.name = 'NotGiftReserverError';
+  }
+}
+
 const GIFT_COLUMNS = 'id,list_id,name,link,price,image_url,status,created_at';
 const PRICE_PATTERN = /^\d+(\.\d{1,2})?$/;
 const MAX_PRICE = 99999999.99;
@@ -133,4 +140,24 @@ export async function reserveGift(giftId: string): Promise<void> {
     }
     throw new Error(error.message);
   }
+}
+
+export async function markGiftPurchased(giftId: string): Promise<void> {
+  const { error } = await supabase.rpc('mark_gift_purchased', { p_gift_id: giftId });
+
+  if (error) {
+    if (error.message.includes('only the reserver can mark as purchased')) {
+      throw new NotGiftReserverError();
+    }
+    throw new Error(error.message);
+  }
+}
+
+export async function listMyReservedGiftIds(): Promise<Set<string>> {
+  const { data, error } = await supabase.rpc('my_reserved_gift_ids');
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  return new Set((data ?? []) as string[]);
 }
