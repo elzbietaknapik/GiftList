@@ -9,7 +9,7 @@ main_goal: speed
 top_blocker: time
 milestone_id: shared-gift-reservation
 milestone_seq: 1
-milestone_status: open
+milestone_status: done
 ---
 
 # Roadmap: GiftList
@@ -20,7 +20,7 @@ milestone_status: open
 
 ## Milestone
 
-**M-1: Udostępniona lista z rezerwacją ukrytą** — Status: open
+**M-1: Udostępniona lista z rezerwacją ukrytą** — Status: done
 
 - **Intent:** Dostarczyć end-to-end MVP, w którym Życzący tworzy listę, dodaje prezenty i udostępnia ją linkiem, a Obdarowujący może ją otworzyć, zobaczyć statusy i zarezerwować prezent — bez ujawnienia tożsamości rezerwującego (fundament niespodzianki).
 - **Source materials:** `context/foundation/prd.md` (v1)
@@ -48,7 +48,7 @@ Istniejące narzędzia do list życzeń (Amazon Wishlist, Listronic) są zamkni�
 | S-04  | reserve-gift-hidden-identity | Obdarowujący zarezerwować wolny prezent; status widoczny natychmiast, tożsamość ukryta | S-03, F-01    | US-01, FR-009, FR-010 | done     |
 | S-05  | mark-gift-purchased          | rezerwujący oznaczyć zarezerwowany prezent jako zrealizowany | S-04          | FR-011                | done     |
 | S-06  | protected-deletes            | usunąć listę/prezent tylko, gdy żadna rezerwacja go nie chroni | S-04          | FR-004, FR-006        | done     |
-| S-07  | gift-editing                 | Życzący edytować wolny prezent (nazwa, link, cena, zdjęcie), bez ruszania rezerwacji | S-02, S-04    | FR-012, ADR-002       | planned  |
+| S-07  | gift-editing                 | Życzący edytować wolny prezent (nazwa, link, cena, zdjęcie), bez ruszania rezerwacji | S-02, S-04    | FR-012, ADR-002       | done     |
 
 ## Streams
 
@@ -169,7 +169,7 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 - **Blockers:** —
 - **Unknowns:** — (decyzja o dopuszczeniu edycji podjęta w ADR-002)
 - **Risk:** Wyścig „odczyt statusu → update": prezent może zostać zarezerwowany między sprawdzeniem w kliencie a zapisem. Guard RLS w `USING`/`WITH CHECK` jest źródłem prawdy i musi odrzucić taki zapis.
-- **Status:** planned
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -201,7 +201,7 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 
 ## Milestone History
 
-(Do pierwszej generacji pusta; wpisy dopisuje zamknięcie kamienia milowego.)
+- **M-1: Udostępniona lista z rezerwacją ukrytą** (`shared-gift-reservation`) — closed 2026-11-04. Wszystkie F-NN i S-NN `done`; edycja wolnego prezentu dopisana jako FR-012/S-07 per ADR-002.
 
 ## Done
 

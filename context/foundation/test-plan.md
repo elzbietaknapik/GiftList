@@ -74,6 +74,10 @@ UI hides the edit action for `reserved`/`purchased` gifts, `updateGift` in
 `supabase/migrations/20261104120000_gift_editing_guard.sql` enforces the same
 rule in `USING` and `WITH CHECK`. `src/lib/gifts.test.ts` exercises the client
 guard under `npm test` (Vitest) and needs no Docker.
+`supabase/tests/gift_editing_guard.test.sql` proves the database layer with
+eight pgTAP assertions (reserved, purchased, free-with-reservation, WITH CHECK,
+non-owner, and unchanged data after refusal). Risk #4 is fully covered at both
+the unit and integration layers.
 
 ---
 
@@ -85,10 +89,10 @@ orchestrator updates Status as artifacts appear on disk.
 
 | # | Phase name                          | Goal (one line)                                                                                 | Risks covered | Test types                        | Status      | Change folder |
 |---|-------------------------------------|--------------------------------------------------------------------------------------------------|---------------|-----------------------------------|-------------|---------------|
-| 1 | Reservation lifecycle integrity     | Prove two concurrent reservations never overwrite each other and status transitions stay allowed | #1, #5        | integration (pgTAP)               | change opened | context/changes/testing-reservation-lifecycle/ |
-| 2 | Identity and access boundary        | Prove reserving identity and list access hold for every role and every read path                | #2, #3        | integration (pgTAP), API contract | not started | —             |
-| 3 | Protected mutations and validation  | Prove deletes of reserved items are refused and invalid gift data is rejected at the data layer | #4, #6        | integration (pgTAP), unit (Vitest) | not started | —         |
-| 4 | Quality-gates wiring                | Lock the baseline locally: lint, typecheck, pgTAP, unit tests                                   | cross-cutting | gates                             | not started | —             |
+| 1 | Reservation lifecycle integrity     | Prove two concurrent reservations never overwrite each other and status transitions stay allowed | #1, #5        | integration (pgTAP)               | complete | context/changes/testing-reservation-lifecycle/ |
+| 2 | Identity and access boundary        | Prove reserving identity and list access hold for every role and every read path                | #2, #3        | integration (pgTAP), API contract | complete | context/changes/reservation-privacy-tests/     |
+| 3 | Protected mutations and validation  | Prove deletes of reserved items are refused and invalid gift data is rejected at the data layer | #4, #6        | integration (pgTAP), unit (Vitest) | complete | context/changes/gift-editing/                  |
+| 4 | Quality-gates wiring                | Lock the baseline locally: lint, typecheck, pgTAP, unit tests                                   | cross-cutting | gates                             | complete | —                                              |
 
 **Status vocabulary** (fixed — parser literals):
 
@@ -195,11 +199,22 @@ the relevant rollout phase ships; before that, the sub-section reads
 
 ### 6.4 Adding a test for a new API endpoint or RPC
 
-- TBD — see §3 Phase 2 (identity and list-access boundary, for every role and read path, via pgTAP).
+- Reference file: `supabase/tests/reservation_privacy.test.sql` (17
+  assertions) — switch role/JWT per actor, assert the positive and negative
+  paths on every read path, and keep the file transactional.
+- Wrap the whole file in `begin`/`rollback`; pin `plan(N)` and keep the
+  numbered assertion map in a comment.
 
 ### 6.5 Adding a test for a protected mutation
 
-- TBD — see §3 Phase 3 (delete of a reserved gift or list refused with an explanation).
+- Reference file: `supabase/tests/gift_editing_guard.test.sql` (risk #4 — RLS
+  `update_gifts` refuses edits of reserved, purchased, and reserved-backed
+  gifts).
+- Pattern: run the mutation as the affected role, assert `0` updated rows when
+  `USING` rejects the old row, use `throws_ok(..., '42501', NULL, ...)` when
+  `WITH CHECK` rejects the new row, and add a positive control on a free row.
+- Keep a final assertion that the refused mutations left the protected rows
+  unchanged.
 
 ### 6.6 Per-rollout-phase notes
 
@@ -219,9 +234,9 @@ contributors should respect these unless the underlying assumption changes.
 
 ## 8. Freshness Ledger
 
-- Strategy (§1–§5) last reviewed: 2026-10-23
-- Stack versions last verified: 2026-10-23
-- AI-native tool references last verified: 2026-10-23
+- Strategy (§1–§5) last reviewed: 2026-11-04
+- Stack versions last verified: 2026-11-04
+- AI-native tool references last verified: 2026-11-04
 
 Refresh (`/10x-test-plan --refresh`) when:
 

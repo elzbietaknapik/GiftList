@@ -23,7 +23,7 @@ Dopuszczamy edycję prezentu przez właściciela listy (nazwa, link, cena, opcjo
 Reguła jest egzekwowana dwuwarstwowo:
 
 1. **Warstwa aplikacji** — `updateGift` w `src/lib/gifts.ts` przed zapisem sprawdza aktualny status prezentu oraz brak wiersza w `reservation_status`. Przy naruszeniu rzuca `GiftNotEditableError` z komunikatem „Nie można edytować zarezerwowanego lub zrealizowanego prezentu.".
-2. **Warstwa bazy danych** — polityka RLS `update_gifts` wymaga własności listy, statusu innego niż `reserved` (`status IS DISTINCT FROM 'reserved'`) oraz braku rezerwacji dla wiersza, zarówno w `USING` (stary wiersz), jak i w `WITH CHECK` (nowy wiersz). Dzięki temu nawet bezpośrednie wywołanie PostgREST nie ominie guardu.
+2. **Warstwa bazy danych** — polityka RLS `update_gifts` wymaga własności listy, statusu `free` oraz braku rezerwacji dla wiersza, zarówno w `USING` (stary wiersz), jak i w `WITH CHECK` (nowy wiersz). Brak rezerwacji jest sprawdzany przez `public.gift_has_reservation(uuid)`, funkcję `SECURITY DEFINER` zwracającą wyłącznie boolean: bezpośrednie podzapytanie do `reservations` z polityki `gifts` powodowałoby rekurencję RLS (polityka `reservations` czyta `gifts`). Dzięki temu nawet bezpośrednie wywołanie PostgREST nie ominie guardu, a tożsamość rezerwującego pozostaje ukryta.
 
 Edycja nie zmienia cyklu życia statusu: `NewGift` nie zawiera pola `status`, więc operacja nie może zmienić `free` na `reserved`/`purchased` ani odwrotnie.
 
