@@ -16,6 +16,13 @@ export class ListAlreadyExistsError extends Error {
   }
 }
 
+export class ListHasReservationsError extends Error {
+  constructor() {
+    super('Nie można usunąć listy, która ma zarezerwowane lub zrealizowane prezenty.');
+    this.name = 'ListHasReservationsError';
+  }
+}
+
 export async function getMyList(userId: string): Promise<GiftList | null> {
   const { data, error } = await supabase
     .from('gifts_lists')
@@ -61,4 +68,19 @@ export async function openSharedList(token: string): Promise<SharedGiftList> {
   }
   const { id, name, share_token, created_at, owner_id } = data as SharedGiftList;
   return { id, name, share_token, created_at, owner_id };
+}
+
+export async function deleteList(listId: string): Promise<void> {
+  const { data, error } = await supabase
+    .from('gifts_lists')
+    .delete()
+    .eq('id', listId)
+    .select('id');
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  if (!data || data.length === 0) {
+    throw new ListHasReservationsError();
+  }
 }

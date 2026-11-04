@@ -36,6 +36,13 @@ export class NotGiftReserverError extends Error {
   }
 }
 
+export class GiftNotDeletableError extends Error {
+  constructor() {
+    super('Nie można usunąć zarezerwowanego lub zrealizowanego prezentu.');
+    this.name = 'GiftNotDeletableError';
+  }
+}
+
 const GIFT_COLUMNS = 'id,list_id,name,link,price,image_url,status,created_at';
 const PRICE_PATTERN = /^\d+(\.\d{1,2})?$/;
 const MAX_PRICE = 99999999.99;
@@ -150,6 +157,21 @@ export async function markGiftPurchased(giftId: string): Promise<void> {
       throw new NotGiftReserverError();
     }
     throw new Error(error.message);
+  }
+}
+
+export async function deleteGift(giftId: string): Promise<void> {
+  const { data, error } = await supabase
+    .from('gifts')
+    .delete()
+    .eq('id', giftId)
+    .select('id');
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  if (!data || data.length === 0) {
+    throw new GiftNotDeletableError();
   }
 }
 

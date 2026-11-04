@@ -47,7 +47,7 @@ Istniejące narzędzia do list życzeń (Amazon Wishlist, Listronic) są zamkni�
 | S-03  | share-link-and-guest-access  | udostępnić listę linkiem; gość otworzyć link i zobaczyć listę ze statusami | S-02          | FR-007, FR-008, FR-010 | done     |
 | S-04  | reserve-gift-hidden-identity | Obdarowujący zarezerwować wolny prezent; status widoczny natychmiast, tożsamość ukryta | S-03, F-01    | US-01, FR-009, FR-010 | done     |
 | S-05  | mark-gift-purchased          | rezerwujący oznaczyć zarezerwowany prezent jako zrealizowany | S-04          | FR-011                | in-progress |
-| S-06  | protected-deletes            | usunąć listę/prezent tylko, gdy żadna rezerwacja go nie chroni | S-04          | FR-004, FR-006        | proposed |
+| S-06  | protected-deletes            | usunąć listę/prezent tylko, gdy żadna rezerwacja go nie chroni | S-04          | FR-004, FR-006        | in-progress |
 
 ## Streams
 
@@ -156,7 +156,7 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Odmowa musi być komunikowana z wyjaśnieniem (PRD: „odmowa z wyjaśnieniem") — inaczej użytkownik nie rozumie, dlaczego delete nie przechodzi.
-- **Status:** proposed
+- **Status:** in-progress
 
 ## Backlog Handoff
 
