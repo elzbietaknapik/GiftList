@@ -263,22 +263,22 @@ Zweryfikować oba przepływy na koncie właściciela i gościa, potwierdzić bra
 ### Phase 1: Data layer — delete gift and delete list
 
 #### Automated
-- [x] 1.1 `npx tsc --noEmit` passes
-- [x] 1.2 `npx expo lint` passes
-- [x] 1.3 `src/lib/gifts.ts` exports `deleteGift` and `GiftNotDeletableError`; `src/lib/lists.ts` exports `deleteList` and `ListHasReservationsError`
+- [x] 1.1 `npx tsc --noEmit` passes — 523b8d3
+- [x] 1.2 `npx expo lint` passes — 523b8d3
+- [x] 1.3 `src/lib/gifts.ts` exports `deleteGift` and `GiftNotDeletableError`; `src/lib/lists.ts` exports `deleteList` and `ListHasReservationsError` — 523b8d3
 
 ### Phase 2: Gift delete action with inline confirm
 
 #### Automated
-- [ ] 2.1 `npx tsc --noEmit` passes
-- [ ] 2.2 `npx expo lint` passes
-- [ ] 2.3 `src/components/ui/button.tsx` accepts `variant`; `src/components/gift-list.tsx` accepts `onDelete` and `deletingId`
+- [x] 2.1 `npx tsc --noEmit` passes
+- [x] 2.2 `npx expo lint` passes
+- [x] 2.3 `src/components/ui/button.tsx` accepts `variant`; `src/components/gift-list.tsx` accepts `onDelete` and `deletingId`
 
 #### Manual
-- [ ] 2.4 Free gift shows “Usuń”; tap reveals “Potwierdź”/“Anuluj”; cancel restores state
-- [ ] 2.5 Confirming removes the gift and the list refreshes without an app restart
-- [ ] 2.6 Reserved and purchased gifts show no delete action
-- [ ] 2.7 Guest view shows no delete action at all
+- [x] 2.4 Free gift shows “Usuń”; tap reveals “Potwierdź”/“Anuluj”; cancel restores state
+- [x] 2.5 Confirming removes the gift and the list refreshes without an app restart
+- [x] 2.6 Reserved and purchased gifts show no delete action
+- [x] 2.7 Guest view shows no delete action at all
 
 ### Phase 3: Delete list action in owner header
 

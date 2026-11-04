@@ -11,7 +11,7 @@ import { ThemedView } from '@/components/themed-view';
 import { FormError } from '@/components/ui/form-error';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { listGifts, type Gift } from '@/lib/gifts';
+import { deleteGift, GiftNotDeletableError, listGifts, type Gift } from '@/lib/gifts';
 import { getMyList, type GiftList as GiftListModel } from '@/lib/lists';
 import { useSession } from '@/lib/session';
 import { supabase } from '@/lib/supabase';
@@ -25,6 +25,8 @@ export default function AppIndexScreen() {
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [giftsLoading, setGiftsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [giftDeleteError, setGiftDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!userId) return;
@@ -68,6 +70,25 @@ export default function AppIndexScreen() {
     void supabase.auth.signOut();
   };
 
+  const handleDeleteGift = async (gift: Gift) => {
+    if (!list) return;
+    setDeletingId(gift.id);
+    setGiftDeleteError(null);
+    try {
+      await deleteGift(gift.id);
+      const data = await listGifts(list.id);
+      setGifts(data);
+    } catch (e) {
+      if (e instanceof GiftNotDeletableError) {
+        setGiftDeleteError(e.message);
+      } else {
+        setGiftDeleteError(e instanceof Error ? e.message : 'Nie udało się usunąć prezentu.');
+      }
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   if (loading) {
     return (
       <ThemedView style={styles.centered}>
@@ -87,6 +108,8 @@ export default function AppIndexScreen() {
         </Pressable>
       </View>
 
+      {giftDeleteError ? <FormError>{giftDeleteError}</FormError> : null}
+
       {error ? <FormError>{error}</FormError> : null}
 
       {list ? (
@@ -102,7 +125,11 @@ export default function AppIndexScreen() {
           ) : gifts.length === 0 ? (
             <ListEmptyState />
           ) : (
-            <GiftList gifts={gifts} />
+            <GiftList
+              gifts={gifts}
+              onDelete={handleDeleteGift}
+              deletingId={deletingId}
+            />
           )}
         </ScrollView>
       ) : user ? (

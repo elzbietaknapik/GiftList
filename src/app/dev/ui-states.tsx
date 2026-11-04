@@ -74,6 +74,11 @@ function UiStatesContent() {
           <Button label="Zapisz" onPress={() => {}} loading />
         </Section>
 
+        <Section label="destructive">
+          <Button label="Usuń" variant="destructive" onPress={() => {}} />
+          <Button label="Usuń" variant="destructive" onPress={() => {}} disabled />
+        </Section>
+
         <Section label="empty">
           <ListEmptyState />
         </Section>

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -23,6 +24,8 @@ type GiftListProps = {
   onMarkPurchased?: (gift: Gift) => void;
   purchasingId?: string | null;
   ownReservedIds?: ReadonlySet<string>;
+  onDelete?: (gift: Gift) => void;
+  deletingId?: string | null;
 };
 
 export function GiftList({
@@ -32,7 +35,20 @@ export function GiftList({
   onMarkPurchased,
   purchasingId,
   ownReservedIds,
+  onDelete,
+  deletingId,
 }: GiftListProps) {
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const activeConfirmingId =
+    confirmingId && gifts.some((gift) => gift.id === confirmingId && gift.status === 'free')
+      ? confirmingId
+      : null;
+
+  const handleDelete = (gift: Gift) => {
+    setConfirmingId(null);
+    onDelete?.(gift);
+  };
+
   return (
     <View style={styles.list}>
       {gifts.map((gift) => (
@@ -62,6 +78,33 @@ export function GiftList({
               onPress={() => onMarkPurchased(gift)}
             />
           ) : null}
+          {gift.status === 'free' && onDelete ? (
+            activeConfirmingId === gift.id ? (
+              <View style={styles.confirmRow}>
+                <Button
+                  label="Potwierdź"
+                  variant="destructive"
+                  accessibilityLabel={`Potwierdź usunięcie: ${gift.name}`}
+                  loading={deletingId === gift.id}
+                  disabled={deletingId !== null && deletingId !== gift.id}
+                  onPress={() => handleDelete(gift)}
+                  style={styles.confirmButton}
+                />
+                <Button
+                  label="Anuluj"
+                  onPress={() => setConfirmingId(null)}
+                  style={styles.confirmButton}
+                />
+              </View>
+            ) : (
+              <Button
+                label="Usuń"
+                accessibilityLabel={`Usuń: ${gift.name}`}
+                disabled={deletingId !== null}
+                onPress={() => setConfirmingId(gift.id)}
+              />
+            )
+          ) : null}
           <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
             {gift.link}
           </ThemedText>
@@ -88,5 +131,12 @@ const styles = StyleSheet.create({
   },
   name: {
     flexShrink: 1,
+  },
+  confirmRow: {
+    flexDirection: 'row',
+    gap: Spacing.two,
+  },
+  confirmButton: {
+    flex: 1,
   },
 });

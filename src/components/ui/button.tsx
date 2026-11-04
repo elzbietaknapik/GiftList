@@ -5,9 +5,12 @@ import { ThemedText } from '@/components/themed-text';
 import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
+type ButtonVariant = 'primary' | 'destructive';
+
 type ButtonProps = {
   label: string;
   onPress: () => void;
+  variant?: ButtonVariant;
   loading?: boolean;
   disabled?: boolean;
   accessibilityLabel?: string;
@@ -17,6 +20,7 @@ type ButtonProps = {
 export function Button({
   label,
   onPress,
+  variant = 'primary',
   loading,
   disabled,
   accessibilityLabel,
@@ -24,6 +28,7 @@ export function Button({
 }: ButtonProps) {
   const theme = useTheme();
   const isDisabled = disabled || loading;
+  const backgroundColor = variant === 'destructive' ? theme.destructive : theme.primary;
   const [focused, setFocused] = useState(false);
 
   return (
@@ -37,7 +42,7 @@ export function Button({
       accessibilityState={{ disabled: isDisabled, busy: loading }}
       style={({ pressed }) => [
         styles.base,
-        { backgroundColor: theme.primary, borderRadius: Radius.small, paddingVertical: Spacing.three },
+        { backgroundColor, borderRadius: Radius.small, paddingVertical: Spacing.three },
         pressed && styles.pressed,
         isDisabled && styles.disabled,
         { borderColor: focused ? theme.ring : 'transparent' },

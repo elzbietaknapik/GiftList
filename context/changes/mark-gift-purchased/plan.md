@@ -249,13 +249,13 @@ Zweryfikować przepływ na trzech kontach: właściciel, rezerwujący i inny go�
 ### Phase 3: Guest view — mark purchased flow
 
 #### Automated
-- [x] 3.1 `npx tsc --noEmit` passes
-- [x] 3.2 `npx expo lint` passes
-- [x] 3.3 `src/app/(app)/list/[token].tsx` does not import `supabase` directly
+- [x] 3.1 `npx tsc --noEmit` passes — b4e82d8
+- [x] 3.2 `npx expo lint` passes — b4e82d8
+- [x] 3.3 `src/app/(app)/list/[token].tsx` does not import `supabase` directly — b4e82d8
 
 #### Manual
-- [x] 3.4 Reserver sees “Oznacz jako kupiony” on own reserved gift; after tap status becomes “Zrealizowany” without app restart and the button disappears
-- [x] 3.5 Guest who reserved a gift in the same session sees the purchase button right after reserving, without reopening the screen
+- [x] 3.4 Reserver sees “Oznacz jako kupiony” on own reserved gift; after tap status becomes “Zrealizowany” without app restart and the button disappears — b4e82d8
+- [x] 3.5 Guest who reserved a gift in the same session sees the purchase button right after reserving, without reopening the screen — b4e82d8
 
 ### Phase 4: End-to-end verification
 
