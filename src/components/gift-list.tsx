@@ -20,9 +20,19 @@ type GiftListProps = {
   gifts: Gift[];
   onReserve?: (gift: Gift) => void;
   reservingId?: string | null;
+  onMarkPurchased?: (gift: Gift) => void;
+  purchasingId?: string | null;
+  ownReservedIds?: ReadonlySet<string>;
 };
 
-export function GiftList({ gifts, onReserve, reservingId }: GiftListProps) {
+export function GiftList({
+  gifts,
+  onReserve,
+  reservingId,
+  onMarkPurchased,
+  purchasingId,
+  ownReservedIds,
+}: GiftListProps) {
   return (
     <View style={styles.list}>
       {gifts.map((gift) => (
@@ -41,6 +51,15 @@ export function GiftList({ gifts, onReserve, reservingId }: GiftListProps) {
               loading={reservingId === gift.id}
               disabled={reservingId !== null}
               onPress={() => onReserve(gift)}
+            />
+          ) : null}
+          {gift.status === 'reserved' && onMarkPurchased && ownReservedIds?.has(gift.id) ? (
+            <Button
+              label="Oznacz jako kupiony"
+              accessibilityLabel={`Oznacz jako kupiony: ${gift.name}`}
+              loading={purchasingId === gift.id}
+              disabled={purchasingId !== null}
+              onPress={() => onMarkPurchased(gift)}
             />
           ) : null}
           <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>

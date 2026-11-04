@@ -232,19 +232,19 @@ Zweryfikować przepływ na trzech kontach: właściciel, rezerwujący i inny go�
 ### Phase 1: Data layer — mark purchased and own reserved ids
 
 #### Automated
-- [x] 1.1 `npx tsc --noEmit` passes
-- [x] 1.2 `npx expo lint` passes
-- [x] 1.3 `src/lib/gifts.ts` exports `markGiftPurchased`, `NotGiftReserverError` and `listMyReservedGiftIds`
+- [x] 1.1 `npx tsc --noEmit` passes — 3908189
+- [x] 1.2 `npx expo lint` passes — 3908189
+- [x] 1.3 `src/lib/gifts.ts` exports `markGiftPurchased`, `NotGiftReserverError` and `listMyReservedGiftIds` — 3908189
 
 ### Phase 2: Gift list purchase action slot
 
 #### Automated
-- [ ] 2.1 `npx tsc --noEmit` passes
-- [ ] 2.2 `npx expo lint` passes
-- [ ] 2.3 `src/components/gift-list.tsx` accepts `onMarkPurchased`, `purchasingId`, `ownReservedIds` and uses `Button`
+- [x] 2.1 `npx tsc --noEmit` passes
+- [x] 2.2 `npx expo lint` passes
+- [x] 2.3 `src/components/gift-list.tsx` accepts `onMarkPurchased`, `purchasingId`, `ownReservedIds` and uses `Button`
 
 #### Manual
-- [ ] 2.4 Owner screen (`src/app/(app)/index.tsx`) shows no “Oznacz jako kupiony” button, including on reserved gifts
+- [x] 2.4 Owner screen (`src/app/(app)/index.tsx`) shows no “Oznacz jako kupiony” button, including on reserved gifts
 
 ### Phase 3: Guest view — mark purchased flow
 
