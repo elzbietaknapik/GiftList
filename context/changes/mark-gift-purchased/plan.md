@@ -260,17 +260,17 @@ Zweryfikować przepływ na trzech kontach: właściciel, rezerwujący i inny go�
 ### Phase 4: End-to-end verification
 
 #### Automated
-- [ ] 4.1 `npx tsc --noEmit` passes on the final tree
-- [ ] 4.2 `npx expo lint` passes on the final tree
-- [ ] 4.3 `supabase/` has no changes (`git diff --stat -- supabase/` empty)
+- [x] 4.1 `npx tsc --noEmit` passes on the final tree
+- [x] 4.2 `npx expo lint` passes on the final tree
+- [x] 4.3 `supabase/` has no changes (`git diff --stat -- supabase/` empty)
 
 #### Manual
-- [ ] 4.4 Owner opening own link sees “Zrealizowany” and no purchase button
-- [ ] 4.5 Non-reserving guest sees no purchase button on a reserved gift; after purchase, reopening the screen shows “Zrealizowany”
-- [ ] 4.6 Rapid double tap on “Oznacz jako kupiony” sends one RPC call
-- [ ] 4.7 Reserver reopening the screen after purchase sees “Zrealizowany” and no button
-- [ ] 4.8 No view (owner, guest, messages) shows the reserver identity
-- [ ] 4.9 S-04 reservation still works: free gift can be reserved; second guest gets “Ten prezent został już zarezerwowany.”
+- [x] 4.4 Owner opening own link sees “Zrealizowany” and no purchase button
+- [x] 4.5 Non-reserving guest sees no purchase button on a reserved gift; after purchase, reopening the screen shows “Zrealizowany”
+- [x] 4.6 Rapid double tap on “Oznacz jako kupiony” sends one RPC call
+- [x] 4.7 Reserver reopening the screen after purchase sees “Zrealizowany” and no button
+- [x] 4.8 No view (owner, guest, messages) shows the reserver identity
+- [x] 4.9 S-04 reservation still works: free gift can be reserved; second guest gets “Ten prezent został już zarezerwowany.”
 
 ## References
 

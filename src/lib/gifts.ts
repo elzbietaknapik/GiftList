@@ -43,6 +43,13 @@ export class GiftNotDeletableError extends Error {
   }
 }
 
+export class GiftNotEditableError extends Error {
+  constructor() {
+    super('Nie można edytować zarezerwowanego lub zrealizowanego prezentu.');
+    this.name = 'GiftNotEditableError';
+  }
+}
+
 const GIFT_COLUMNS = 'id,list_id,name,link,price,image_url,status,created_at';
 const PRICE_PATTERN = /^\d+(\.\d{1,2})?$/;
 const MAX_PRICE = 99999999.99;
@@ -131,6 +138,50 @@ export async function addGift(listId: string, gift: NewGift): Promise<Gift> {
 
   if (error) {
     throw new Error(error.message);
+  }
+  return toGift(data as GiftRow);
+}
+
+export async function updateGift(giftId: string, gift: NewGift): Promise<Gift> {
+  const { data: current, error: currentError } = await supabase
+    .from('gifts')
+    .select('status')
+    .eq('id', giftId)
+    .maybeSingle();
+
+  if (currentError) {
+    throw new Error(currentError.message);
+  }
+  if (!current || current.status !== 'free') {
+    throw new GiftNotEditableError();
+  }
+
+  const { data: reservations, error: reservationError } = await supabase
+    .from('reservation_status')
+    .select('gift_id')
+    .eq('gift_id', giftId)
+    .limit(1);
+
+  if (reservationError) {
+    throw new Error(reservationError.message);
+  }
+  if (reservations && reservations.length > 0) {
+    throw new GiftNotEditableError();
+  }
+
+  const { data, error } = await supabase
+    .from('gifts')
+    .update(gift)
+    .eq('id', giftId)
+    .eq('status', 'free')
+    .select(GIFT_COLUMNS)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  if (!data) {
+    throw new GiftNotEditableError();
   }
   return toGift(data as GiftRow);
 }

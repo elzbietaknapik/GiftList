@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": ".bootstrap-scaffold",
-    "slug": ".bootstrap-scaffold",
+    "name": "GiftList",
+    "slug": "GiftList",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

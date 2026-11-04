@@ -31,7 +31,6 @@ Właściciel widzi przy wolnym prezencie przycisk „Usuń”, a przy zarezerwow
 - Zmian w `supabase/`, nowych migracji, RPC ani polityk RLS — guardy już istnieją i są źródłem prawdy.
 - Usuwania listy przez gościa lub członka listy — tylko właściciel (RLS i UI).
 - Cofnięcia usunięcia (undo), kosza ani soft-delete.
-- Edycji prezentu (Non-Goals PRD).
 - Natywnego modala potwierdzenia (`Alert`) — decyzja: inline two-step.
 - Nowych testów pgTAP lub testów automatycznych klienta — decyzja użytkownika: kontrole manualne.
 - Realtime i odświeżania u innych przeglądających.
@@ -238,7 +237,7 @@ Zweryfikować oba przepływy na koncie właściciela i gościa, potwierdzić bra
 
 - Zmiany w `supabase/`, RPC, RLS i migracje.
 - Testy pgTAP i testy automatyczne klienta.
-- Undo, kosz, soft-delete, edycja prezentu.
+- Undo, kosz, soft-delete.
 - Realtime i odświeżanie u innych przeglądających.
 
 ## Open risks & assumptions
@@ -270,39 +269,39 @@ Zweryfikować oba przepływy na koncie właściciela i gościa, potwierdzić bra
 ### Phase 2: Gift delete action with inline confirm
 
 #### Automated
-- [x] 2.1 `npx tsc --noEmit` passes
-- [x] 2.2 `npx expo lint` passes
-- [x] 2.3 `src/components/ui/button.tsx` accepts `variant`; `src/components/gift-list.tsx` accepts `onDelete` and `deletingId`
+- [x] 2.1 `npx tsc --noEmit` passes — 888acd1
+- [x] 2.2 `npx expo lint` passes — 888acd1
+- [x] 2.3 `src/components/ui/button.tsx` accepts `variant`; `src/components/gift-list.tsx` accepts `onDelete` and `deletingId` — 888acd1
 
 #### Manual
-- [x] 2.4 Free gift shows “Usuń”; tap reveals “Potwierdź”/“Anuluj”; cancel restores state
-- [x] 2.5 Confirming removes the gift and the list refreshes without an app restart
-- [x] 2.6 Reserved and purchased gifts show no delete action
-- [x] 2.7 Guest view shows no delete action at all
+- [x] 2.4 Free gift shows “Usuń”; tap reveals “Potwierdź”/“Anuluj”; cancel restores state — 888acd1
+- [x] 2.5 Confirming removes the gift and the list refreshes without an app restart — 888acd1
+- [x] 2.6 Reserved and purchased gifts show no delete action — 888acd1
+- [x] 2.7 Guest view shows no delete action at all — 888acd1
 
 ### Phase 3: Delete list action in owner header
 
 #### Automated
-- [ ] 3.1 `npx tsc --noEmit` passes
-- [ ] 3.2 `npx expo lint` passes
-- [ ] 3.3 `src/app/(app)/index.tsx` calls `deleteList` only from the owner action
+- [x] 3.1 `npx tsc --noEmit` passes
+- [x] 3.2 `npx expo lint` passes
+- [x] 3.3 `src/app/(app)/index.tsx` calls `deleteList` only from the owner action
 
 #### Manual
-- [ ] 3.4 List without reservations: “Usuń listę” → “Potwierdź” deletes it and shows the create-list form
-- [ ] 3.5 List with a reservation: attempt shows “Nie można usunąć listy, która ma zarezerwowane lub zrealizowane prezenty.” and the list remains
-- [ ] 3.6 “Anuluj” closes the confirmation without any change
+- [x] 3.4 List without reservations: “Usuń listę” → “Potwierdź” deletes it and shows the create-list form
+- [x] 3.5 List with a reservation: attempt shows “Nie można usunąć listy, która ma zarezerwowane lub zrealizowane prezenty.” and the list remains
+- [x] 3.6 “Anuluj” closes the confirmation without any change
 
 ### Phase 4: End-to-end verification
 
 #### Automated
-- [ ] 4.1 `npx tsc --noEmit` passes on the final tree
-- [ ] 4.2 `npx expo lint` passes on the final tree
-- [ ] 4.3 `supabase/` has no changes (`git diff --stat -- supabase/` empty)
+- [x] 4.1 `npx tsc --noEmit` passes on the final tree
+- [x] 4.2 `npx expo lint` passes on the final tree
+- [x] 4.3 `supabase/` has no changes (`git diff --stat -- supabase/` empty)
 
 #### Manual
-- [ ] 4.4 Owner deletes a free gift; it disappears after the refetch
-- [ ] 4.5 Owner cannot delete reserved or purchased gifts — no button
-- [ ] 4.6 Owner deletes a list without reservations and returns to the create-list form
-- [ ] 4.7 Owner cannot delete a list with a reservation — refusal message shown
-- [ ] 4.8 Guest sees no delete actions
-- [ ] 4.9 S-04 and S-05 still work: reserve and mark-purchased flows unregressed
+- [x] 4.4 Owner deletes a free gift; it disappears after the refetch
+- [x] 4.5 Owner cannot delete reserved or purchased gifts — no button
+- [x] 4.6 Owner deletes a list without reservations and returns to the create-list form
+- [x] 4.7 Owner cannot delete a list with a reservation — refusal message shown
+- [x] 4.8 Guest sees no delete actions
+- [x] 4.9 S-04 and S-05 still work: reserve and mark-purchased flows unregressed

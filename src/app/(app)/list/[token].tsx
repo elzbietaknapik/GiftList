@@ -1,7 +1,8 @@
 import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
+import { EditGiftForm } from '@/components/edit-gift-form';
 import { GiftList } from '@/components/gift-list';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -36,7 +37,15 @@ export default function SharedListScreen() {
   const [ownReservedIds, setOwnReservedIds] = useState<ReadonlySet<string>>(new Set());
   const [purchasingId, setPurchasingId] = useState<string | null>(null);
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
+  const [editingGift, setEditingGift] = useState<Gift | null>(null);
   const [activeToken, setActiveToken] = useState(token);
+  const scrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    if (editingGift) {
+      scrollRef.current?.scrollTo({ y: 0, animated: true });
+    }
+  }, [editingGift]);
 
   if (activeToken !== token) {
     setActiveToken(token);
@@ -49,6 +58,7 @@ export default function SharedListScreen() {
     setOwnReservedIds(new Set());
     setPurchasingId(null);
     setPurchaseError(null);
+    setEditingGift(null);
   }
 
   useEffect(() => {
@@ -78,6 +88,7 @@ export default function SharedListScreen() {
   }, [token, valid]);
 
   const canReserve = list !== null && list.owner_id !== user?.id;
+  const canEdit = list !== null && list.owner_id === user?.id;
 
   async function refreshListState(listId: string) {
     const [giftData, reservedIds] = await Promise.all([
@@ -161,7 +172,18 @@ export default function SharedListScreen() {
       {purchaseError ? <FormError>{purchaseError}</FormError> : null}
 
       {list ? (
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+        <ScrollView ref={scrollRef} style={styles.scroll} contentContainerStyle={styles.content}>
+          {editingGift ? (
+            <EditGiftForm
+              key={editingGift.id}
+              gift={editingGift}
+              onSaved={(updated) => {
+                setGifts((prev) => prev.map((gift) => (gift.id === updated.id ? updated : gift)));
+                setEditingGift(null);
+              }}
+              onCancel={() => setEditingGift(null)}
+            />
+          ) : null}
           {gifts.length === 0 ? (
             <ThemedText>Ta lista nie ma jeszcze prezentów.</ThemedText>
           ) : (
@@ -172,6 +194,7 @@ export default function SharedListScreen() {
               onMarkPurchased={canReserve ? handleMarkPurchased : undefined}
               purchasingId={purchasingId}
               ownReservedIds={ownReservedIds}
+              onEdit={canEdit ? setEditingGift : undefined}
             />
           )}
         </ScrollView>

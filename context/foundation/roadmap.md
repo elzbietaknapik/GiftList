@@ -3,7 +3,7 @@ project: "GiftList"
 version: 1
 status: draft
 created: 2026-10-05
-updated: 2026-11-02
+updated: 2026-11-04
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -25,7 +25,7 @@ milestone_status: open
 - **Intent:** Dostarczyć end-to-end MVP, w którym Życzący tworzy listę, dodaje prezenty i udostępnia ją linkiem, a Obdarowujący może ją otworzyć, zobaczyć statusy i zarezerwować prezent — bez ujawnienia tożsamości rezerwującego (fundament niespodzianki).
 - **Source materials:** `context/foundation/prd.md` (v1)
 - **Done when:** każde F-NN i S-NN poniżej ma status `done`.
-- **Scope anchors:** FR-001…FR-011, US-01.
+- **Scope anchors:** FR-001…FR-012, US-01.
 
 ## Vision recap
 
@@ -46,8 +46,9 @@ Istniejące narzędzia do list życzeń (Amazon Wishlist, Listronic) są zamkni�
 | S-02  | add-gift                     | Życzący dodać prezent (nazwa, link, cena, opcjonalnie zdjęcie) | S-01          | FR-005                | done     |
 | S-03  | share-link-and-guest-access  | udostępnić listę linkiem; gość otworzyć link i zobaczyć listę ze statusami | S-02          | FR-007, FR-008, FR-010 | done     |
 | S-04  | reserve-gift-hidden-identity | Obdarowujący zarezerwować wolny prezent; status widoczny natychmiast, tożsamość ukryta | S-03, F-01    | US-01, FR-009, FR-010 | done     |
-| S-05  | mark-gift-purchased          | rezerwujący oznaczyć zarezerwowany prezent jako zrealizowany | S-04          | FR-011                | in-progress |
-| S-06  | protected-deletes            | usunąć listę/prezent tylko, gdy żadna rezerwacja go nie chroni | S-04          | FR-004, FR-006        | in-progress |
+| S-05  | mark-gift-purchased          | rezerwujący oznaczyć zarezerwowany prezent jako zrealizowany | S-04          | FR-011                | done     |
+| S-06  | protected-deletes            | usunąć listę/prezent tylko, gdy żadna rezerwacja go nie chroni | S-04          | FR-004, FR-006        | done     |
+| S-07  | gift-editing                 | Życzący edytować wolny prezent (nazwa, link, cena, zdjęcie), bez ruszania rezerwacji | S-02, S-04    | FR-012, ADR-002       | planned  |
 
 ## Streams
 
@@ -56,7 +57,7 @@ Pomoc nawigacyjna — grupuje elementy współdzielące łańcuch Prerequisites.
 | Stream | Theme                         | Chain                                      | Note |
 | ------ | ----------------------------- | ------------------------------------------ | ---- |
 | A      | Pętla rezerwacji (ukryta tożsamość) | `F-01` → `S-04` → `S-05` → `S-06`          | Serce hipotezy — walidacja niespodzianki; czytane pierwsze przy celu `speed`. |
-| B      | Lista i udostępnianie         | `S-01` → `S-02` → `S-03`                   | Ścieżka właściciela; dołącza do Stream A przy `S-04`. |
+| B      | Lista i udostępnianie         | `S-01` → `S-02` → `S-03`; `S-07` po `S-04` | Ścieżka właściciela; dołącza do Stream A przy `S-04`. Edycja prezentu (`S-07`) współdzieli guard „tylko wolny" z usuwaniem (`S-06`). |
 
 ## Baseline
 
@@ -144,7 +145,7 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Kontrola tożsamości rezerwującego (`my_reserved_gift_ids`) — właściciel listy nie może oznaczać cudzej rezerwacji jako zrealizowanej.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-06: Usuwanie z ochroną rezerwacji
 
@@ -156,7 +157,19 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Odmowa musi być komunikowana z wyjaśnieniem (PRD: „odmowa z wyjaśnieniem") — inaczej użytkownik nie rozumie, dlaczego delete nie przechodzi.
-- **Status:** in-progress
+- **Status:** done
+
+### S-07: Edycja wolnego prezentu
+
+- **Outcome:** Życzący może edytować nazwę, link, cenę i opcjonalny URL zdjęcia prezentu, dopóki prezent jest wolny; prezent z rezerwacją (`reserved`/`purchased`) jest nieedytowalny, a odmowa jest komunikowana.
+- **Change ID:** gift-editing
+- **PRD refs:** FR-012, `docs/adr-002-gift-editing.md`
+- **Prerequisites:** S-02 (prezent istnieje), S-04 (rezerwacje, których trzeba strzec)
+- **Parallel with:** S-05, S-06
+- **Blockers:** —
+- **Unknowns:** — (decyzja o dopuszczeniu edycji podjęta w ADR-002)
+- **Risk:** Wyścig „odczyt statusu → update": prezent może zostać zarezerwowany między sprawdzeniem w kliencie a zapisem. Guard RLS w `USING`/`WITH CHECK` jest źródłem prawdy i musi odrzucić taki zapis.
+- **Status:** planned
 
 ## Backlog Handoff
 
@@ -167,8 +180,9 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 | S-02       | add-gift                     | Dodawanie prezentów do listy                             | no                    | done — zrealizowane (FR-005) |
 | S-03       | share-link-and-guest-access  | Link udostępniania i widok listy dla gościa               | no                    | done — zrealizowane (FR-007, FR-008, FR-010) |
 | S-04       | reserve-gift-hidden-identity | Rezerwacja prezentu z ukrytą tożsamością                 | no                    | gwiazda przewodnia; czeka na S-03, F-01 |
-| S-05       | mark-gift-purchased          | Oznaczanie rezerwacji jako zrealizowanej                 | no                    | czeka na S-04 |
-| S-06       | protected-deletes            | Usuwanie listy/prezentu z ochroną rezerwacji             | no                    | czeka na S-04 |
+| S-05       | mark-gift-purchased          | Oznaczanie rezerwacji jako zrealizowanej                 | no                    | done — zrealizowane (FR-011) |
+| S-06       | protected-deletes            | Usuwanie listy/prezentu z ochroną rezerwacji             | no                    | done — zrealizowane (FR-004, FR-006) |
+| S-07       | gift-editing                 | Edycja wolnego prezentu z ochroną rezerwacji             | yes                   | ADR-002; guard w `updateGift` + RLS `update_gifts` |
 
 ## Open Roadmap Questions
 
@@ -179,7 +193,6 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 - **Scraping metadanych z linków (Open Graph)** — Poza zakresem MVP (PRD Non-Goals); przyszła funkcja.
 - **Powiadomienia (email/push)** — Poza zakresem MVP (PRD Non-Goals); użytkownicy sprawdzają listę sami.
 - **Wiele list na użytkownika** — Poza zakresem MVP (PRD Non-Goals); unikalny indeks `gifts_lists.owner_id` łatwy do usunięcia.
-- **Edycja prezentu po dodaniu** — Poza zakresem MVP (PRD Non-Goals); MVP: tylko dodaj/usuń wolny.
 - **Self-reservation** — Poza zakresem MVP (PRD Non-Goals); Życzący wie sam, co kupuje.
 - **OAuth / passwordless** — Zdeferowane przy celu `speed`; MVP = email + hasło.
 - **CI/CD + git remote (GHA auto-deploy-on-merge, `supabase db push`, `supabase test db` w CI)** — Zdeferowane (deploy-plan: następny milestone); F-01 definiuje testy, które CI potem odpalą.

@@ -29,7 +29,7 @@ Właściciel widzi „Usuń” przy wolnych prezentach i „Usuń listę” w na
 
 **In scope:** `deleteGift`, `deleteList`, wariant `destructive` w `Button`, akcja usuwania w `GiftList`, akcja usuwania listy w nagłówku właściciela, sekcja w `ui-states.tsx`.
 
-**Out of scope:** migracje i `supabase/`, pgTAP, undo/kosz, edycja prezentu, Realtime, modal `Alert`.
+**Out of scope:** migracje i `supabase/`, pgTAP, undo/kosz, Realtime, modal `Alert`. (Edycja prezentu jest osobnym zakresem: S-07 / `docs/adr-002-gift-editing.md`.)
 
 ## Architecture / Approach
 

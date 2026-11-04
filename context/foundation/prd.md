@@ -73,6 +73,8 @@ Ktoś, kto przed okazją (urodziny, święta, ślub) zbiera pomysły na prezenty
   > Socrates: No counter-argument; it stands as written.
 - FR-006: Życzący can remove a gift from their list only if the gift is unreserved. Priority: must-have
   > Socrates: Counter-argument considered: "removing a reserved gift silently breaks the Obdarowujący's commitment." Resolution: changed — removal blocked when gift is reserved or purchased.
+- FR-012: Życzący can edit a gift on their list (name, link, price, optional image) only while the gift has no reservation and its status is not `reserved` or `purchased`. Priority: must-have
+  > Decision: moved from Non-Goals to In-Scope per `docs/adr-002-gift-editing.md` — editing is allowed for free gifts, blocked the same way as deletion to protect the Obdarowujący's commitment.
 
 ### Sharing
 - FR-007: Życzący can generate a shareable link for their list. Priority: must-have
@@ -97,7 +99,7 @@ Ktoś, kto przed okazją (urodziny, święta, ślub) zbiera pomysły na prezenty
 
 ## Business Logic
 
-Aplikacja zarządza cyklem życia prezentu (wolny → zarezerwowany → zrealizowany) ukrywając tożsamość rezerwującego przed wszystkimi innymi użytkownikami i blokując usuwanie/modyfikację zarezerwowanych elementów — chroniąc zobowiązanie Obdarowującego i niespodziankę.
+Aplikacja zarządza cyklem życia prezentu (wolny → zarezerwowany → zrealizowany) ukrywając tożsamość rezerwującego przed wszystkimi innymi użytkownikami i blokując usuwanie/modyfikację zarezerwowanych elementów — chroniąc zobowiązanie Obdarowującego i niespodziankę. Właściciel może edytować prezent tylko dopóki jest wolny; edycja prezentu z rezerwacją jest odrzucana z wyjaśnieniem (ADR-002).
 
 Reguła konsumuje status prezentu, tożsamość aktualnie zalogowanego użytkownika i jego rolę wobec listy (właściciel vs. obdarowujący). Przy rezerwacji system zmienia status i przypisuje tożsamość rezerwującego wewnętrznie, ale nie ujawnia jej nikomu. Przy próbie usunięcia lub modyfikacji zarezerwowanego elementu — odmowa z wyjaśnieniem.
 
@@ -118,7 +120,6 @@ Niezalogowany użytkownik trafiający na link udostępnionej listy: przekierowan
 - Brak automatycznego scrapingu metadanych z linków — MVP wymaga ręcznego wpisania nazwy, ceny i zdjęcia. Pobieranie Open Graph/meta to przyszła funkcja.
 - Brak powiadomień (email/push) — MVP nie informuje o rezerwacjach ani zmianach na liście. Użytkownicy sprawdzają listę sami.
 - Brak wielu list na użytkownika — MVP obsługuje jedną listę. Wiele list (np. na różne okazje) to przyszła funkcja.
-- Brak edycji prezentu po dodaniu — MVP pozwala dodać lub usunąć (jeśli niezarezerwowany), ale nie edytować istniejącego prezentu.
 - Brak self-reservation — Życzący nie rezerwuje prezentów u siebie; wie sam co kupuje.
 
 ## Open Questions

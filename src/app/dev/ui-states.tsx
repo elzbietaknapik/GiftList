@@ -4,10 +4,35 @@ import { ScrollView } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/ui/form-error';
 import { TextField } from '@/components/ui/text-field';
+import { GiftList } from '@/components/gift-list';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ListEmptyState } from '@/components/list-empty-state';
 import { Spacing } from '@/constants/theme';
+import type { Gift } from '@/lib/gifts';
+
+const SAMPLE_GIFTS: Gift[] = [
+  {
+    id: 'sample-free',
+    list_id: 'dev',
+    name: 'Słuchawki bezprzewodowe z bardzo długą nazwą, która powinna się obciąć do dwóch linii',
+    link: 'https://example.com',
+    price: 349.99,
+    image_url: null,
+    status: 'free',
+    created_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 'sample-reserved',
+    list_id: 'dev',
+    name: 'Kubek termiczny',
+    link: 'https://example.com',
+    price: 79,
+    image_url: 'https://example.invalid/missing.jpg',
+    status: 'reserved',
+    created_at: '2026-01-01T00:00:00Z',
+  },
+];
 
 export default function UiStates() {
   if (!__DEV__) return null;
@@ -81,6 +106,10 @@ function UiStatesContent() {
 
         <Section label="empty">
           <ListEmptyState />
+        </Section>
+
+        <Section label="gift card (missing and broken image)">
+          <GiftList gifts={SAMPLE_GIFTS} />
         </Section>
       </ScrollView>
     </ThemedView>

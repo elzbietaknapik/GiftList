@@ -1,7 +1,7 @@
 ---
 change_id: mark-gift-purchased
 title: Mark gift purchased
-status: implementing
+status: implemented
 created: 2026-11-02
 updated: 2026-11-04
 archived_at: null

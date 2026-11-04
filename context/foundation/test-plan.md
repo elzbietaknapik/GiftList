@@ -6,7 +6,7 @@
 >
 > Refresh: re-run `/10x-test-plan --refresh` when stale (see §8).
 >
-> Last updated: 2026-10-23
+> Last updated: 2026-11-04
 
 ---
 
@@ -44,7 +44,7 @@ terms, not test names.
 | 1 | Two gift-givers reserve the same free gift; both see success                                                 | High   | High       | Interview Q1 ("podwójna rezerwacja"); roadmap S-04 Risk (race between reservers); PRD FR-009                       |
 | 2 | Reserving identity leaks through an API response, realtime payload, or UI                                   | High   | Medium     | PRD Guardrails, FR-010, NFR "never leaks"; roadmap F-01 (partial coverage); hot-spot dir `supabase/` (2 commits/30d) |
 | 3 | A person without the link or account reads the list, or reserves a gift by ID from a list they cannot see     | High   | Medium     | PRD Access Control (redirect to login), FR-007/FR-008; roadmap S-03 proposed; hot-spot dir `src/app` (17 commits/30d) |
-| 4 | Owner deletes or edits a gift or list that already has a reservation                                         | Medium | Medium     | PRD FR-004, FR-006; roadmap S-06 proposed                                                                          |
+| 4 | Owner deletes or edits a gift or list that already has a reservation                                         | Medium | Medium     | PRD FR-004, FR-006, FR-012; ADR-002; roadmap S-06, S-07                                                            |
 | 5 | Status "purchased" is set by someone other than the reserving gift-giver                                    | Medium | Low        | PRD FR-011; roadmap S-05 Risk (`my_reserved_gift_ids` control)                                                     |
 | 6 | Gift with an invalid price or link is persisted and breaks the list for gift-givers                          | Medium | Low        | PRD FR-005, Guardrail (data durability); roadmap S-02 Risk (S-02 done)                                             |
 
@@ -59,13 +59,21 @@ Order rows by impact × likelihood. Protect High × High first.
 | #1 | Two concurrent reservations of one free gift: exactly one succeeds, the other gets an explicit refusal; the first reserver's identity is untouched | "Sequential calls equal a race" | Atomicity of the reservation RPC and the status guard; what the client shows while realtime lags | integration (pgTAP inside the database) | Sequential-only test that never exercises concurrency |
 | #2 | A signed-in gift-giver sees no reserving identity in any response, URL, or realtime payload, not just in rendered UI | "The UI not showing it means it does not leak" | Every read path: table, view, RPC, realtime publication set | integration (pgTAP, extending the existing privacy harness) | Assertion only on rendered UI text |
 | #3 | A user outside the list cannot read it or reserve a gift from it by ID | "Logged in means authorized" | List ownership model and the RLS/RPC checks on reservation | integration (pgTAP, RLS/RPC) | Test that only covers the owner |
-| #4 | Deleting a reserved gift or list is refused with an explanation | "A disabled button means blocked" | Delete path enforced at the data layer | integration (pgTAP guard) | Checking only the UI control |
+| #4 | Deleting a reserved gift or list, or editing a reserved gift, is refused with an explanation | "A disabled button means blocked" | Delete and edit paths enforced at the data layer (client guard + RLS) | unit (Vitest, client guard) + integration (pgTAP) | Checking only the UI control |
 | #5 | Someone other than the reserving gift-giver cannot set "purchased" | "The owner can do it too" | Identity comparison at the status-change point | integration (pgTAP) | Happy path only for the reserver |
 | #6 | Invalid price or link is rejected by the data layer, not only by the form | "UI validation is enough" | Validation rules at the data boundary | unit (jest-expo) + integration (pgTAP) | Asserting validation only on the form |
 
 Every top risk gets one row. These rows avoid file anchors and test code.
 They state how the risk should be attacked, which assumption must be
 challenged, and what context must be grounded before planning tests.
+
+**Risk #4 mitigation (2026-11-04).** Editing is blocked in three layers: the
+UI hides the edit action for `reserved`/`purchased` gifts, `updateGift` in
+`src/lib/gifts.ts` rejects non-free gifts or gifts with a reservation, and the
+`update_gifts` RLS policy in
+`supabase/migrations/20261104120000_gift_editing_guard.sql` enforces the same
+rule in `USING` and `WITH CHECK`. `src/lib/gifts.test.ts` exercises the client
+guard under `npm test` (Vitest) and needs no Docker.
 
 ---
 
@@ -79,8 +87,8 @@ orchestrator updates Status as artifacts appear on disk.
 |---|-------------------------------------|--------------------------------------------------------------------------------------------------|---------------|-----------------------------------|-------------|---------------|
 | 1 | Reservation lifecycle integrity     | Prove two concurrent reservations never overwrite each other and status transitions stay allowed | #1, #5        | integration (pgTAP)               | change opened | context/changes/testing-reservation-lifecycle/ |
 | 2 | Identity and access boundary        | Prove reserving identity and list access hold for every role and every read path                | #2, #3        | integration (pgTAP), API contract | not started | —             |
-| 3 | Protected mutations and validation  | Prove deletes of reserved items are refused and invalid gift data is rejected at the data layer | #4, #6        | integration (pgTAP), unit (jest-expo) | not started | —         |
-| 4 | Quality-gates wiring                | Lock the baseline locally: lint, typecheck, pgTAP, jest                                          | cross-cutting | gates                             | not started | —             |
+| 3 | Protected mutations and validation  | Prove deletes of reserved items are refused and invalid gift data is rejected at the data layer | #4, #6        | integration (pgTAP), unit (Vitest) | not started | —         |
+| 4 | Quality-gates wiring                | Lock the baseline locally: lint, typecheck, pgTAP, unit tests                                   | cross-cutting | gates                             | not started | —             |
 
 **Status vocabulary** (fixed — parser literals):
 
@@ -104,7 +112,7 @@ rollout.
 
 | Layer                | Tool                                              | Version | Notes                                                                                   |
 |----------------------|---------------------------------------------------|---------|-----------------------------------------------------------------------------------------|
-| unit + integration (client) | Jest + jest-expo (Expo preset)              | not installed — resolve in §3 Phase 3 | Expo's documented unit-testing setup (Context7, checked: 2026-10-23); install with `npx expo install` |
+| unit (client)        | Vitest                                            | 5.x (installed) | Runs via `npm test`; Supabase client mocked at the module boundary. No React Native renderer in this rollout. |
 | DB integration / RLS / RPC | pgTAP via `npx supabase test db`             | existing | Harness from F-01 (`supabase/tests/reservation_privacy.test.sql`, plan(17)); requires local Docker |
 | API mocking          | none yet — see §3 Phase 3                          | n/a     | Mock only at the network edge (Supabase client boundary), never internal modules         |
 | e2e                  | none yet — deferred to a later lesson / milestone  | n/a     | Expo documents Maestro for EAS E2E flows (Context7, checked: 2026-10-23); not in scope for this rollout |
@@ -134,7 +142,7 @@ phase lands; before that, the gate is `planned`.
 |-----------------------------|---------------------|-------------------------------|-------------------------------------------|
 | lint + typecheck            | local (CI deferred) | required                      | syntactic / type drift                    |
 | pgTAP privacy / RLS / RPC   | local               | required after §3 Phase 1     | reservation races, identity leaks, access |
-| unit + integration (jest)   | local               | required after §3 Phase 3     | validation and client logic regressions   |
+| unit (Vitest)               | local               | required after §3 Phase 3     | validation and client logic regressions   |
 | CI wiring of the gates above | GitHub Actions     | required after the CI milestone (deferred in roadmap) | merges that skip the gates |
 
 Every row corresponds to a gate that either is wired or will be wired by a
@@ -151,7 +159,16 @@ the relevant rollout phase ships; before that, the sub-section reads
 
 ### 6.1 Adding a unit test
 
-- TBD — see §3 Phase 3 (client validation pattern: data boundary rejects invalid price or link, not only the form).
+- Where: `src/**/*.test.ts`, run by `npm test` (Vitest). `vitest.config.mts`
+  maps the `@/*` alias to `src/*`.
+- Pattern: mock the Supabase client at the module boundary
+  (`vi.mock("@/lib/supabase")`) with a chainable query stub; never mock
+  `src/lib/gifts.ts` itself.
+- Assert the domain error (`GiftNotEditableError`) and that the mutating call
+  was not reached; add a happy path that proves the guard does not block a
+  free gift.
+- Reference file: `src/lib/gifts.test.ts` (risk #4 — editing a reserved gift
+  is refused without Docker).
 
 ### 6.2 Adding an integration test
 
