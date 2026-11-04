@@ -46,7 +46,7 @@ Istniejące narzędzia do list życzeń (Amazon Wishlist, Listronic) są zamkni�
 | S-02  | add-gift                     | Życzący dodać prezent (nazwa, link, cena, opcjonalnie zdjęcie) | S-01          | FR-005                | done     |
 | S-03  | share-link-and-guest-access  | udostępnić listę linkiem; gość otworzyć link i zobaczyć listę ze statusami | S-02          | FR-007, FR-008, FR-010 | done     |
 | S-04  | reserve-gift-hidden-identity | Obdarowujący zarezerwować wolny prezent; status widoczny natychmiast, tożsamość ukryta | S-03, F-01    | US-01, FR-009, FR-010 | done     |
-| S-05  | mark-gift-purchased          | rezerwujący oznaczyć zarezerwowany prezent jako zrealizowany | S-04          | FR-011                | proposed |
+| S-05  | mark-gift-purchased          | rezerwujący oznaczyć zarezerwowany prezent jako zrealizowany | S-04          | FR-011                | in-progress |
 | S-06  | protected-deletes            | usunąć listę/prezent tylko, gdy żadna rezerwacja go nie chroni | S-04          | FR-004, FR-006        | proposed |
 
 ## Streams
@@ -144,7 +144,7 @@ Co jest już na miejscu w kodzie (stan na `2026-10-05`, auto-researched + potwie
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Kontrola tożsamości rezerwującego (`my_reserved_gift_ids`) — właściciel listy nie może oznaczać cudzej rezerwacji jako zrealizowanej.
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-06: Usuwanie z ochroną rezerwacji
 

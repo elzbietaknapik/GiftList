@@ -8,7 +8,15 @@ import { ThemedView } from '@/components/themed-view';
 import { FormError } from '@/components/ui/form-error';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { GiftAlreadyReservedError, listGifts, reserveGift, type Gift } from '@/lib/gifts';
+import {
+  GiftAlreadyReservedError,
+  listGifts,
+  listMyReservedGiftIds,
+  markGiftPurchased,
+  NotGiftReserverError,
+  reserveGift,
+  type Gift,
+} from '@/lib/gifts';
 import { openSharedList, type SharedGiftList } from '@/lib/lists';
 import { useSession } from '@/lib/session';
 import { isShareToken } from '@/lib/share-link';
@@ -25,6 +33,9 @@ export default function SharedListScreen() {
   const [error, setError] = useState<string | null>(valid ? null : 'Nieprawidłowy link.');
   const [reservingId, setReservingId] = useState<string | null>(null);
   const [reserveError, setReserveError] = useState<string | null>(null);
+  const [ownReservedIds, setOwnReservedIds] = useState<ReadonlySet<string>>(new Set());
+  const [purchasingId, setPurchasingId] = useState<string | null>(null);
+  const [purchaseError, setPurchaseError] = useState<string | null>(null);
   const [activeToken, setActiveToken] = useState(token);
 
   if (activeToken !== token) {
@@ -35,6 +46,9 @@ export default function SharedListScreen() {
     setError(valid ? null : 'Nieprawidłowy link.');
     setReservingId(null);
     setReserveError(null);
+    setOwnReservedIds(new Set());
+    setPurchasingId(null);
+    setPurchaseError(null);
   }
 
   useEffect(() => {
@@ -44,8 +58,13 @@ export default function SharedListScreen() {
       .then(async (data) => {
         if (!active) return;
         setList(data);
-        const giftData = await listGifts(data.id);
-        if (active) setGifts(giftData);
+        const [giftData, reservedIds] = await Promise.all([
+          listGifts(data.id),
+          listMyReservedGiftIds(),
+        ]);
+        if (!active) return;
+        setGifts(giftData);
+        setOwnReservedIds(reservedIds);
       })
       .catch((e) => {
         if (active) setError(e instanceof Error ? e.message : 'Nie udało się pobrać listy.');
@@ -60,13 +79,22 @@ export default function SharedListScreen() {
 
   const canReserve = list !== null && list.owner_id !== user?.id;
 
+  async function refreshListState(listId: string) {
+    const [giftData, reservedIds] = await Promise.all([
+      listGifts(listId),
+      listMyReservedGiftIds(),
+    ]);
+    setGifts(giftData);
+    setOwnReservedIds(reservedIds);
+  }
+
   async function handleReserve(gift: Gift) {
     if (!list) return;
     setReservingId(gift.id);
     setReserveError(null);
     try {
       await reserveGift(gift.id);
-      setGifts(await listGifts(list.id));
+      await refreshListState(list.id);
     } catch (e) {
       const alreadyReserved = e instanceof GiftAlreadyReservedError;
       setReserveError(
@@ -78,13 +106,33 @@ export default function SharedListScreen() {
       );
       if (alreadyReserved) {
         try {
-          setGifts(await listGifts(list.id));
+          await refreshListState(list.id);
         } catch {
           return;
         }
       }
     } finally {
       setReservingId(null);
+    }
+  }
+
+  async function handleMarkPurchased(gift: Gift) {
+    if (!list) return;
+    setPurchasingId(gift.id);
+    setPurchaseError(null);
+    try {
+      await markGiftPurchased(gift.id);
+      await refreshListState(list.id);
+    } catch (e) {
+      setPurchaseError(
+        e instanceof NotGiftReserverError
+          ? e.message
+          : e instanceof Error
+            ? e.message
+            : 'Nie udało się oznaczyć prezentu jako kupiony.',
+      );
+    } finally {
+      setPurchasingId(null);
     }
   }
 
@@ -110,6 +158,8 @@ export default function SharedListScreen() {
 
       {reserveError ? <FormError>{reserveError}</FormError> : null}
 
+      {purchaseError ? <FormError>{purchaseError}</FormError> : null}
+
       {list ? (
         <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
           {gifts.length === 0 ? (
@@ -119,6 +169,9 @@ export default function SharedListScreen() {
               gifts={gifts}
               onReserve={canReserve ? handleReserve : undefined}
               reservingId={reservingId}
+              onMarkPurchased={canReserve ? handleMarkPurchased : undefined}
+              purchasingId={purchasingId}
+              ownReservedIds={ownReservedIds}
             />
           )}
         </ScrollView>
